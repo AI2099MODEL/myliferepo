@@ -601,34 +601,8 @@ function switchSection(sectionKey) {
     elements.headerTitle.textContent = meta.title;
     elements.headerSubtitle.textContent = meta.subtitle;
 
-    // Inject section action button, Stitch toggle, Google Auth, and tools in header
-    let actionsHtml = `
-        <div class="google-auth-container" id="googleAuthContainer">
-            <button class="btn-google-signin" id="btnGoogleSignIn" title="Sign in with Google Account">
-                <svg class="google-g-icon" viewBox="0 0 24 24" width="18" height="18">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                </svg>
-                <span>Google Sign-In</span>
-            </button>
-            <div class="google-user-badge hidden" id="googleUserBadge">
-                <img class="user-avatar" id="userAvatar" src="" alt="Avatar">
-                <div class="user-info-text">
-                    <span class="user-name" id="userName">User</span>
-                    <span class="user-email" id="userEmail">user@gmail.com</span>
-                </div>
-                <button class="btn-user-signout" id="btnGoogleSignOut" title="Sign out">✕</button>
-            </div>
-        </div>
-        <button class="btn-tool-outline" id="btnHeaderShareQr" title="Share via Offline QR Code">
-            <span>📱 QR Code</span>
-        </button>
-        <button class="btn-tool-outline" id="btnHeaderDriveBackup" title="Backup to Google Drive">
-            <span>☁️ Backup</span>
-        </button>
-    `;
+    // Inject section action button & Stitch toggle in section actions container
+    let actionsHtml = "";
     if (sectionKey !== "stitch" && sectionKey !== "gemini" && sectionKey !== "social") {
         actionsHtml += `
             <button class="btn-stitch-toggle" data-stitch-toggle-for="${sectionKey}" id="btnStitchToggle${capitalize(sectionKey)}">
@@ -641,12 +615,8 @@ function switchSection(sectionKey) {
             ${meta.actionBtn}
         </button>
     `;
-    elements.headerActions.innerHTML = actionsHtml;
-
-    // Re-init Google Auth and header buttons
-    if (window.googleAuthService) window.googleAuthService.init();
-    document.getElementById("btnHeaderShareQr")?.addEventListener("click", () => QrSyncService.openShareModal());
-    document.getElementById("btnHeaderDriveBackup")?.addEventListener("click", () => GoogleDriveService.openModal());
+    const secActionsContainer = document.getElementById("sectionHeaderActions") || elements.headerActions;
+    secActionsContainer.innerHTML = actionsHtml;
 
     // Hook action button handler
     const actionBtnEl = document.getElementById(meta.actionId);
@@ -2799,6 +2769,725 @@ function initListeners() {
             showToast("Settings applied & saved securely");
         });
     }
+}
+
+// ---------------------------------------------------------
+// Global Multi-Language Translation Engine (12 Languages)
+// ---------------------------------------------------------
+const I18N_DICTIONARY = {
+    en: {
+        chat: "Chat", diary: "Diary", events: "Events", vault: "Vault", tasks: "Tasks",
+        stitch: "Stitch AI", gemini: "Gemini Studio", social: "Studio & Social",
+        newThread: "+ New Thread", send: "Send", search: "Search...", add: "Add",
+        lockBinder: "Lock Binder", driveSync: "Drive Sync", aiSettings: "AI Settings"
+    },
+    es: {
+        chat: "Mensajes", diary: "Diario", events: "Eventos", vault: "Bóveda", tasks: "Tareas",
+        stitch: "Stitch IA", gemini: "Estudio Gemini", social: "Estudio y Redes",
+        newThread: "+ Nuevo Hilo", send: "Enviar", search: "Buscar...", add: "Añadir",
+        lockBinder: "Bloquear", driveSync: "Google Drive", aiSettings: "Ajustes IA"
+    },
+    fr: {
+        chat: "Messages", diary: "Journal", events: "Événements", vault: "Coffre", tasks: "Tâches",
+        stitch: "Stitch IA", gemini: "Studio Gemini", social: "Studio & Médias",
+        newThread: "+ Nouveau Fil", send: "Envoyer", search: "Rechercher...", add: "Ajouter",
+        lockBinder: "Verrouiller", driveSync: "Google Drive", aiSettings: "Paramètres IA"
+    },
+    de: {
+        chat: "Nachrichten", diary: "Tagebuch", events: "Termine", vault: "Tresor", tasks: "Aufgaben",
+        stitch: "Stitch KI", gemini: "Gemini Studio", social: "Social Media",
+        newThread: "+ Neuer Chat", send: "Senden", search: "Suchen...", add: "Hinzufügen",
+        lockBinder: "Sperren", driveSync: "Google Drive", aiSettings: "KI-Einstellungen"
+    },
+    hi: {
+        chat: "बातचीत", diary: "डायरी", events: "कार्यक्रम", vault: "वॉल्ट", tasks: "कार्य",
+        stitch: "स्टिच एआई", gemini: "जेमिनी स्टूडियो", social: "सोशल मीडिया",
+        newThread: "+ नया थ्रेड", send: "भेजें", search: "खोजें...", add: "जोड़ें",
+        lockBinder: "लॉक करें", driveSync: "गूगल ड्राइव", aiSettings: "एआई सेटिंग्स"
+    },
+    zh: {
+        chat: "消息", diary: "日记", events: "日程", vault: "保险库", tasks: "任务",
+        stitch: "Stitch AI", gemini: "Gemini 工作室", social: "社交与视频",
+        newThread: "+ 新建对话", send: "发送", search: "搜索...", add: "添加",
+        lockBinder: "锁定", driveSync: "Google 云端", aiSettings: "AI 设置"
+    },
+    ja: {
+        chat: "チャット", diary: "日記", events: "予定", vault: "保管庫", tasks: "タスク",
+        stitch: "Stitch AI", gemini: "Geminiスタジオ", social: "ソーシャル動画",
+        newThread: "+ 新規スレッド", send: "送信", search: "検索...", add: "追加",
+        lockBinder: "ロック", driveSync: "Google ドライブ", aiSettings: "AI 設定"
+    },
+    ar: {
+        chat: "المحادثة", diary: "المذكرات", events: "الأحداث", vault: "الخزنة", tasks: "المهام",
+        stitch: "ستيتش ذكاء", gemini: "استوديو جيميني", social: "استوديو الفيديو",
+        newThread: "+ محادثة جديدة", send: "إرسال", search: "بحث...", add: "إضافة",
+        lockBinder: "قفل", driveSync: "جوجل درايف", aiSettings: "إعدادات الذكاء"
+    },
+    pt: {
+        chat: "Conversas", diary: "Diário", events: "Eventos", vault: "Cofre", tasks: "Tarefas",
+        stitch: "Stitch IA", gemini: "Estúdio Gemini", social: "Redes & Vídeo",
+        newThread: "+ Nova Conversa", send: "Enviar", search: "Pesquisar...", add: "Adicionar",
+        lockBinder: "Bloquear", driveSync: "Google Drive", aiSettings: "Configurações IA"
+    },
+    ru: {
+        chat: "Чат", diary: "Дневник", events: "События", vault: "Сейф", tasks: "Задачи",
+        stitch: "Stitch AI", gemini: "Gemini Студия", social: "Соцсети и видео",
+        newThread: "+ Новый тред", send: "Отправить", search: "Поиск...", add: "Добавить",
+        lockBinder: "Заблокировать", driveSync: "Google Диск", aiSettings: "Настройки AI"
+    },
+    it: {
+        chat: "Messaggi", diary: "Diario", events: "Eventi", vault: "Cassaforte", tasks: "Attività",
+        stitch: "Stitch IA", gemini: "Studio Gemini", social: "Social e Video",
+        newThread: "+ Nuova Chat", send: "Invia", search: "Cerca...", add: "Aggiungi",
+        lockBinder: "Blocca", driveSync: "Google Drive", aiSettings: "Impostazioni IA"
+    },
+    ko: {
+        chat: "대화", diary: "다이어리", events: "일정", vault: "보관함", tasks: "할 일",
+        stitch: "Stitch AI", gemini: "Gemini 스튜디오", social: "소셜 & 숏폼",
+        newThread: "+ 새 대화", send: "전송", search: "검색...", add: "추가",
+        lockBinder: "잠금", driveSync: "구글 드라이브", aiSettings: "AI 설정"
+    }
+};
+
+class TranslationEngine {
+    constructor() {
+        this.currentLang = localStorage.getItem("mylyfe_lang") || "en";
+    }
+
+    setLanguage(lang) {
+        if (!I18N_DICTIONARY[lang]) return;
+        this.currentLang = lang;
+        localStorage.setItem("mylyfe_lang", lang);
+        this.applyTranslations();
+        showToast(`Language switched to ${lang.toUpperCase()}`);
+    }
+
+    applyTranslations() {
+        const dict = I18N_DICTIONARY[this.currentLang] || I18N_DICTIONARY.en;
+        const selectEl = document.getElementById("selectAppLanguage");
+        if (selectEl) selectEl.value = this.currentLang;
+
+        // Update tab labels
+        document.querySelectorAll("[data-section]").forEach(tab => {
+            const sec = tab.dataset.section;
+            if (dict[sec]) {
+                const label = tab.querySelector(".tab-label, .mob-label");
+                if (label) label.textContent = dict[sec];
+            }
+        });
+    }
+}
+
+const translationEngine = new TranslationEngine();
+
+// ---------------------------------------------------------
+// Luxury Theme Engine (4 Curated Themes)
+// ---------------------------------------------------------
+class ThemeManager {
+    constructor() {
+        this.currentTheme = localStorage.getItem("mylyfe_theme") || "apple-luxe";
+    }
+
+    init() {
+        this.applyTheme(this.currentTheme);
+        const sel = document.getElementById("selectAppTheme");
+        if (sel) {
+            sel.value = this.currentTheme;
+            sel.addEventListener("change", (e) => this.applyTheme(e.target.value));
+        }
+    }
+
+    applyTheme(themeName) {
+        this.currentTheme = themeName;
+        document.body.dataset.theme = themeName;
+        localStorage.setItem("mylyfe_theme", themeName);
+        const sel = document.getElementById("selectAppTheme");
+        if (sel) sel.value = themeName;
+    }
+}
+
+const themeManager = new ThemeManager();
+
+// ---------------------------------------------------------
+// Device Frame Mockup Manager (App vs Web View)
+// ---------------------------------------------------------
+class DeviceFrameManager {
+    static isPhoneMode = false;
+
+    static toggle() {
+        DeviceFrameManager.isPhoneMode = !DeviceFrameManager.isPhoneMode;
+        document.body.classList.toggle("device-frame-active", DeviceFrameManager.isPhoneMode);
+        const btn = document.getElementById("btnToggleDeviceFrame");
+        if (btn) {
+            btn.innerHTML = DeviceFrameManager.isPhoneMode ? "<span>💻 Desktop View</span>" : "<span>📱 Phone View</span>";
+        }
+        showToast(DeviceFrameManager.isPhoneMode ? "Switched to iPhone Device Mockup View" : "Returned to Desktop Binder View");
+    }
+}
+
+// ---------------------------------------------------------
+// Category-Based QR Chat Sharing Service
+// ---------------------------------------------------------
+class CategoryQrService {
+    static openModal(category) {
+        const modal = document.getElementById("modalCategoryQr");
+        const titleEl = document.getElementById("catQrModalTitle");
+        const iconEl = document.getElementById("catQrIcon");
+        const metaEl = document.getElementById("catQrPayloadCategory");
+        const container = document.getElementById("catQrCanvasContainer");
+
+        const icons = {
+            "Family": "👨‍👩‍👧‍👦", "Friends": "🤝", "Work": "💼", "Personal": "🌿", "Project": "🚀"
+        };
+
+        if (titleEl) titleEl.textContent = `${category} Category QR`;
+        if (iconEl) iconEl.textContent = icons[category] || "📱";
+        if (metaEl) metaEl.textContent = `Category: ${category} • Tap to Add Contact`;
+
+        const payload = {
+            app: "MyLyfe",
+            category: category,
+            timestamp: Date.now(),
+            user: JSON.parse(localStorage.getItem("mylyfe_google_user") || '{"name":"Alex Rivera"}')
+        };
+
+        if (container && window.SimpleQRCode) {
+            container.innerHTML = SimpleQRCode.generateSVG(JSON.stringify(payload), 220);
+        }
+
+        if (modal) modal.classList.add("open");
+    }
+
+    static copyPayload() {
+        const payload = JSON.stringify({ app: "MyLyfe", category: "Family", joinLink: "https://mylyfe.web.app/join/family" });
+        navigator.clipboard.writeText(payload).then(() => showToast("Category Join payload copied to clipboard"));
+    }
+}
+
+// ---------------------------------------------------------
+// First-Time Onboarding & Configuration Wizard Service
+// ---------------------------------------------------------
+class OnboardingWizardService {
+    constructor() {
+        this.currentStep = 1;
+        this.totalSteps = 5;
+    }
+
+    init() {
+        const isOnboarded = localStorage.getItem("mylyfe_onboarded_v2");
+        if (!isOnboarded) {
+            setTimeout(() => this.open(), 800);
+        }
+
+        document.getElementById("btnOpenWizard")?.addEventListener("click", () => this.open());
+        document.getElementById("btnWizardNext")?.addEventListener("click", () => this.next());
+        document.getElementById("btnWizardBack")?.addEventListener("click", () => this.prev());
+
+        // Step dot clicks
+        document.querySelectorAll(".wizard-step-dot").forEach(dot => {
+            dot.addEventListener("click", () => this.goToStep(parseInt(dot.dataset.step)));
+        });
+
+        // Theme selection inside wizard
+        document.querySelectorAll("#wizardThemeSelect .select-pill").forEach(pill => {
+            pill.addEventListener("click", () => {
+                document.querySelectorAll("#wizardThemeSelect .select-pill").forEach(p => p.classList.remove("active"));
+                pill.classList.add("active");
+                themeManager.applyTheme(pill.dataset.theme);
+            });
+        });
+
+        // Language selection inside wizard
+        document.querySelectorAll("#wizardLangSelect .select-pill").forEach(pill => {
+            pill.addEventListener("click", () => {
+                document.querySelectorAll("#wizardLangSelect .select-pill").forEach(p => p.classList.remove("active"));
+                pill.classList.add("active");
+                translationEngine.setLanguage(pill.dataset.lang);
+            });
+        });
+    }
+
+    open() {
+        this.currentStep = 1;
+        this.updateUI();
+        document.getElementById("modalOnboardingWizard")?.classList.add("open");
+    }
+
+    close() {
+        document.getElementById("modalOnboardingWizard")?.classList.remove("open");
+        localStorage.setItem("mylyfe_onboarded_v2", "true");
+        showToast("✨ My Lyfe setup complete! Welcome aboard.");
+    }
+
+    next() {
+        if (this.currentStep < this.totalSteps) {
+            this.currentStep++;
+            this.updateUI();
+        } else {
+            this.saveAndFinish();
+        }
+    }
+
+    prev() {
+        if (this.currentStep > 1) {
+            this.currentStep--;
+            this.updateUI();
+        }
+    }
+
+    goToStep(step) {
+        this.currentStep = step;
+        this.updateUI();
+    }
+
+    updateUI() {
+        // Update panes
+        for (let i = 1; i <= this.totalSteps; i++) {
+            const pane = document.getElementById(`wizardStep${i}`);
+            if (pane) pane.classList.toggle("active", i === this.currentStep);
+        }
+
+        // Update dots
+        document.querySelectorAll(".wizard-step-dot").forEach(dot => {
+            const s = parseInt(dot.dataset.step);
+            dot.classList.toggle("active", s === this.currentStep);
+            dot.classList.toggle("completed", s < this.currentStep);
+        });
+
+        // Update buttons
+        const btnBack = document.getElementById("btnWizardBack");
+        const btnNext = document.getElementById("btnWizardNext");
+        if (btnBack) btnBack.disabled = this.currentStep === 1;
+        if (btnNext) btnNext.textContent = this.currentStep === this.totalSteps ? "Complete Setup ✓" : "Next Step →";
+    }
+
+    saveAndFinish() {
+        const pin = document.getElementById("wizardInputPin")?.value.trim() || "1234";
+        localStorage.setItem("ledger_security_pin", pin);
+
+        const apiKey = document.getElementById("wizardInputApiKey")?.value.trim();
+        if (apiKey) geminiService.setApiKey(apiKey);
+
+        this.close();
+    }
+}
+
+const onboardingWizard = new OnboardingWizardService();
+
+// ---------------------------------------------------------
+// TinyURL Social Campaign Link Shortener
+// ---------------------------------------------------------
+class TinyUrlService {
+    static generate() {
+        const input = document.getElementById("inputLongUrl");
+        const url = input?.value.trim() || "https://mylyfe.web.app/social/daily-clip";
+        const randomSlug = Math.random().toString(36).substring(2, 7);
+        const tinyUrl = `https://tinyurl.com/lyfe-${randomSlug}`;
+
+        const resultRow = document.getElementById("tinyUrlResultRow");
+        const resultText = document.getElementById("tinyUrlResultText");
+
+        if (resultText) resultText.textContent = tinyUrl;
+        if (resultRow) resultRow.classList.remove("hidden");
+
+        showToast("Generated campaign TinyURL!");
+    }
+
+    static copy() {
+        const text = document.getElementById("tinyUrlResultText")?.textContent;
+        if (text) {
+            navigator.clipboard.writeText(text).then(() => showToast("TinyURL copied to clipboard!"));
+        }
+    }
+}
+
+// ---------------------------------------------------------
+// Event Listeners Initialization
+// ---------------------------------------------------------
+function initListeners() {
+    // Biometrics & Security
+    biometricAuth.init();
+
+    // Google Identity
+    googleAuthService.init();
+
+    // Event Alarms
+    eventAlarmService.init();
+
+    // Theme Manager
+    themeManager.init();
+
+    // Onboarding Wizard
+    onboardingWizard.init();
+
+    // Translation Engine
+    translationEngine.applyTranslations();
+
+    // Header Controls
+    document.getElementById("selectAppLanguage")?.addEventListener("change", (e) => translationEngine.setLanguage(e.target.value));
+    document.getElementById("btnToggleDeviceFrame")?.addEventListener("click", () => DeviceFrameManager.toggle());
+
+    // Category QR Buttons
+    document.querySelectorAll(".btn-cat-qr").forEach(btn => {
+        btn.addEventListener("click", () => CategoryQrService.openModal(btn.dataset.category));
+    });
+    document.getElementById("btnCloseCatQr")?.addEventListener("click", () => {
+        document.getElementById("modalCategoryQr")?.classList.remove("open");
+    });
+    document.getElementById("btnCopyCatQr")?.addEventListener("click", () => CategoryQrService.copyPayload());
+    document.getElementById("btnOpenScanQrModalChat")?.addEventListener("click", () => QrSyncService.openScanModal());
+
+    // TinyURL Generator
+    document.getElementById("btnGenerateTinyUrl")?.addEventListener("click", () => TinyUrlService.generate());
+    document.getElementById("btnCopyTinyUrl")?.addEventListener("click", () => TinyUrlService.copy());
+
+    // Google Play Store Legal Modals
+    document.getElementById("btnOpenPrivacyPolicy")?.addEventListener("click", () => {
+        document.getElementById("modalPrivacyPolicy")?.classList.add("open");
+    });
+    document.getElementById("btnClosePrivacyPolicy")?.addEventListener("click", () => {
+        document.getElementById("modalPrivacyPolicy")?.classList.remove("open");
+    });
+
+    document.getElementById("btnOpenTermsOfService")?.addEventListener("click", () => {
+        document.getElementById("modalTermsOfService")?.classList.add("open");
+    });
+    document.getElementById("btnCloseTermsOfService")?.addEventListener("click", () => {
+        document.getElementById("modalTermsOfService")?.classList.remove("open");
+    });
+
+    document.getElementById("btnOpenDataSafety")?.addEventListener("click", () => {
+        document.getElementById("modalDataSafety")?.classList.add("open");
+    });
+    document.getElementById("btnCloseDataSafety")?.addEventListener("click", () => {
+        document.getElementById("modalDataSafety")?.classList.remove("open");
+    });
+
+    // Settings Modal Tab Switcher
+    document.querySelectorAll(".settings-tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".settings-tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".settings-tab-content").forEach(c => c.classList.remove("active"));
+            btn.classList.add("active");
+            const tabKey = btn.dataset.tab;
+            if (tabKey === "gemini") document.getElementById("tabContentGemini")?.classList.add("active");
+            if (tabKey === "auth") document.getElementById("tabContentAuth")?.classList.add("active");
+            if (tabKey === "adsense") document.getElementById("tabContentAdsense")?.classList.add("active");
+            if (tabKey === "firebase") document.getElementById("tabContentFirebase")?.classList.add("active");
+        });
+    });
+
+    // Navigation Rails & Mobile Bottom Bar
+    elements.railTabs.forEach(tab => {
+        tab.addEventListener("click", () => switchSection(tab.dataset.section));
+    });
+    elements.mobileTabs.forEach(tab => {
+        tab.addEventListener("click", () => switchSection(tab.dataset.section));
+    });
+
+    // QR Code Sharing Modals
+    document.getElementById("btnCloseShareQr")?.addEventListener("click", () => {
+        document.getElementById("modalShareQr").classList.remove("open");
+    });
+    document.getElementById("btnOpenScanQrModal")?.addEventListener("click", () => QrSyncService.openScanModal());
+    document.getElementById("btnCloseScanQr")?.addEventListener("click", () => {
+        document.getElementById("modalScanQr").classList.remove("open");
+    });
+    document.getElementById("btnConfirmImportQr")?.addEventListener("click", () => {
+        const raw = document.getElementById("inputQrRawData").value;
+        QrSyncService.importPayload(raw);
+    });
+    document.getElementById("btnCopyQrPayload")?.addEventListener("click", () => {
+        const payload = JSON.stringify({ app: "MyLyfe", exportedAt: Date.now(), threads: store.data.threads });
+        navigator.clipboard.writeText(payload).then(() => showToast("QR Payload copied to clipboard"));
+    });
+
+    // Google Drive Sync Modal
+    document.getElementById("btnOpenDriveSync")?.addEventListener("click", () => GoogleDriveService.openModal());
+    document.getElementById("btnCloseDriveSync")?.addEventListener("click", () => {
+        document.getElementById("modalGoogleDriveSync").classList.remove("open");
+    });
+    document.getElementById("btnTriggerDriveExport")?.addEventListener("click", () => GoogleDriveService.exportBackup());
+    document.getElementById("inputDriveBackupFile")?.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+            GoogleDriveService.importBackup(e.target.files[0]);
+        }
+    });
+
+    // Studio & Social Listeners
+    document.getElementById("btnGenerateVideoClip")?.addEventListener("click", () => SocialStudioService.generateVideoClip());
+    document.getElementById("btnToggleVideoPlay")?.addEventListener("click", () => SocialStudioService.togglePlay());
+    document.getElementById("btnGenerateViralCaption")?.addEventListener("click", () => SocialStudioService.generateViralCaption());
+    document.getElementById("btnSchedulePost")?.addEventListener("click", () => SocialStudioService.schedulePost());
+    document.getElementById("btnSimulatePublishNow")?.addEventListener("click", () => SocialStudioService.simulatePublish());
+    document.getElementById("btnQueueClipToScheduler")?.addEventListener("click", () => {
+        const cap = document.getElementById("videoCaptionAnimated").textContent;
+        document.getElementById("inputSocialCaption").value = `${cap}\n\n#mindfulness #productivity #shorts #reels`;
+        showToast("Clip queued into scheduler composer");
+    });
+
+    // Platform toggle buttons
+    document.querySelectorAll("#platformSelectRow .platform-btn").forEach(btn => {
+        btn.addEventListener("click", () => btn.classList.toggle("active"));
+    });
+
+    // Video theme selection
+    document.querySelectorAll("#videoAestheticSelect .select-pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+            const frame = document.getElementById("videoCanvasArt");
+            if (frame) {
+                frame.className = `video-canvas-art ${pill.dataset.aesthetic}-canvas`;
+            }
+        });
+    });
+
+    // Chat
+    elements.btnSendMessage.addEventListener("click", sendChatMessage);
+    elements.chatInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendChatMessage();
+    });
+    elements.btnOpenNewThreadModal.addEventListener("click", () => {
+        elements.modalNewThread.classList.add("open");
+    });
+    document.getElementById("btnCloseNewThreadModal").addEventListener("click", () => {
+        elements.modalNewThread.classList.remove("open");
+    });
+    document.getElementById("btnConfirmNewThread").addEventListener("click", () => {
+        const name = document.getElementById("inputThreadName").value.trim();
+        if (!name) return;
+        const activeCat = document.querySelector("#threadCategorySelect .select-pill.active");
+        const category = activeCat ? activeCat.dataset.value : "Personal";
+        const activeEmoji = document.querySelector("#threadEmojiSelect .emoji-opt.active");
+        const emoji = activeEmoji ? activeEmoji.dataset.emoji : "🌿";
+
+        const key = name.toLowerCase().replace(/\s+/g, '_') + '_' + Math.floor(Math.random() * 1000);
+        store.data.threads.push({
+            id: Date.now(),
+            key,
+            name,
+            category,
+            emoji,
+            lastMsg: "Thread created",
+            timestamp: Date.now()
+        });
+
+        store.save();
+        state.activeThreadKey = key;
+        document.getElementById("inputThreadName").value = "";
+        elements.modalNewThread.classList.remove("open");
+        renderChat();
+        showToast("New thread created");
+    });
+
+    // Diary
+    elements.diarySearchInput.addEventListener("input", (e) => {
+        state.diarySearch = e.target.value;
+        renderDiary();
+    });
+    elements.btnClearDiarySearch.addEventListener("click", () => {
+        elements.diarySearchInput.value = "";
+        state.diarySearch = "";
+        renderDiary();
+    });
+    elements.diaryTagFilters.querySelectorAll(".tag-pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+            elements.diaryTagFilters.querySelectorAll(".tag-pill").forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            state.diaryTagFilter = pill.dataset.tag;
+            renderDiary();
+        });
+    });
+    document.getElementById("btnCloseDiaryModal").addEventListener("click", () => {
+        elements.modalDiary.classList.remove("open");
+    });
+    document.getElementById("btnSaveDiaryEntry").addEventListener("click", saveDiaryEntry);
+
+    const btnOpenDiaryAi = document.getElementById("btnOpenDiaryAiReflection");
+    if (btnOpenDiaryAi) {
+        btnOpenDiaryAi.addEventListener("click", openDiaryAiReflectionModal);
+    }
+
+    // Events
+    elements.eventFilterRow.querySelectorAll(".filter-pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+            elements.eventFilterRow.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            state.eventFilter = pill.dataset.filter;
+            renderEvents();
+        });
+    });
+    document.getElementById("btnCloseEventModal").addEventListener("click", () => {
+        elements.modalEvent.classList.remove("open");
+    });
+    document.getElementById("btnSaveEvent").addEventListener("click", saveEvent);
+
+    const btnTriggerTestAlarm = document.getElementById("btnTestAlarmSound");
+    if (btnTriggerTestAlarm) {
+        btnTriggerTestAlarm.addEventListener("click", () => {
+            eventAlarmService.playChime();
+            showToast("Acoustic chime played");
+        });
+    }
+
+    // Vault
+    elements.vaultCategoryRow.querySelectorAll(".category-pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+            elements.vaultCategoryRow.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            state.vaultCategoryFilter = pill.dataset.category;
+            renderVault();
+        });
+    });
+    document.getElementById("btnCloseVaultModal").addEventListener("click", () => {
+        elements.modalVault.classList.remove("open");
+    });
+    document.getElementById("btnSaveVaultDoc").addEventListener("click", saveVaultDoc);
+
+    const btnOpenVaultAi = document.getElementById("btnOpenVaultAiInsights");
+    if (btnOpenVaultAi) {
+        btnOpenVaultAi.addEventListener("click", openVaultAiInsightsModal);
+    }
+
+    // Tasks
+    elements.tasksPriorityRow.querySelectorAll(".priority-pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+            elements.tasksPriorityRow.querySelectorAll(".priority-pill").forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            state.taskPriorityFilter = pill.dataset.priority;
+            renderTasks();
+        });
+    });
+    elements.btnToggleCompletedTasks.addEventListener("click", () => {
+        state.showCompletedTasks = !state.showCompletedTasks;
+        elements.completedTasksContainer.classList.toggle("hidden", !state.showCompletedTasks);
+        elements.completedAccordionArrow.textContent = state.showCompletedTasks ? "▼" : "▶";
+    });
+    document.getElementById("checkTaskSchedule").addEventListener("change", (e) => {
+        document.getElementById("taskDateTimeRow").classList.toggle("hidden", !e.target.checked);
+    });
+    document.getElementById("btnCloseTaskModal").addEventListener("click", () => {
+        elements.modalTask.classList.remove("open");
+    });
+    document.getElementById("btnSaveTask").addEventListener("click", saveTask);
+
+    const btnOpenTaskAi = document.getElementById("btnOpenTaskAiBreakdown");
+    if (btnOpenTaskAi) {
+        btnOpenTaskAi.addEventListener("click", openTaskAiBreakdownModal);
+    }
+
+    // Generic Modal pill selections
+    document.querySelectorAll(".modal-pills-select").forEach(container => {
+        container.querySelectorAll(".select-pill").forEach(pill => {
+            pill.addEventListener("click", () => {
+                container.querySelectorAll(".select-pill").forEach(p => p.classList.remove("active"));
+                pill.classList.add("active");
+            });
+        });
+    });
+
+    document.querySelectorAll(".modal-emojis-select").forEach(container => {
+        container.querySelectorAll(".emoji-opt").forEach(opt => {
+            opt.addEventListener("click", () => {
+                container.querySelectorAll(".emoji-opt").forEach(o => o.classList.remove("active"));
+                opt.classList.add("active");
+            });
+        });
+    });
+
+    document.querySelectorAll(".priority-select-row").forEach(container => {
+        container.querySelectorAll(".priority-opt-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                container.querySelectorAll(".priority-opt-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+            });
+        });
+    });
+
+    // ---------------------------------------------------------
+    // Stitch AI Studio Listeners
+    // ---------------------------------------------------------
+    document.querySelectorAll(".stitch-screen-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            state.currentStitchScreen = btn.dataset.stitchScreen;
+            renderStitch();
+        });
+    });
+
+    document.querySelectorAll(".view-mode-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            state.stitchViewMode = btn.dataset.viewMode;
+            renderStitch();
+        });
+    });
+
+    const btnOpenNewTab = document.getElementById("btnOpenNewTab");
+    if (btnOpenNewTab) {
+        btnOpenNewTab.addEventListener("click", () => {
+            const screenKey = state.currentStitchScreen || "chat";
+            window.open(`stitch-designs/downloaded/${screenKey}.html`, "_blank");
+        });
+    }
+
+    const btnReloadFrame = document.getElementById("btnReloadFrame");
+    if (btnReloadFrame) {
+        btnReloadFrame.addEventListener("click", () => {
+            const iframe = document.getElementById("stitchIframe");
+            if (iframe) {
+                iframe.src = iframe.src;
+                showToast("Stitch preview reloaded");
+            }
+        });
+    }
+
+    const btnCopyPrompt = document.getElementById("btnCopyPrompt");
+    if (btnCopyPrompt) {
+        btnCopyPrompt.addEventListener("click", () => {
+            const txt = document.getElementById("stitchPromptText").textContent;
+            navigator.clipboard.writeText(txt).then(() => {
+                showToast("Prompt copied to clipboard");
+            }).catch(() => {
+                showToast("Prompt ready to copy");
+            });
+        });
+    }
+
+    // ---------------------------------------------------------
+    // Gemini AI Studio Listeners
+    // ---------------------------------------------------------
+    const btnOpenSettings = document.getElementById("btnOpenGeminiSettings");
+    if (btnOpenSettings) btnOpenSettings.addEventListener("click", openGeminiSettingsModal);
+
+    const btnHeroSettings = document.getElementById("btnHeroOpenSettings");
+    if (btnHeroSettings) btnHeroSettings.addEventListener("click", openGeminiSettingsModal);
+
+    const btnCloseSettings = document.getElementById("btnCloseGeminiSettings");
+    if (btnCloseSettings) btnCloseSettings.addEventListener("click", () => {
+        document.getElementById("modalGeminiSettings").classList.remove("open");
+    });
+
+    const btnSaveSettings = document.getElementById("btnSaveGeminiSettings");
+    if (btnSaveSettings) {
+        btnSaveSettings.addEventListener("click", () => {
+            const key = document.getElementById("inputGeminiApiKey").value.trim();
+            const activeModelPill = document.querySelector("#settingsModelSelect .select-pill.active");
+            const model = activeModelPill ? activeModelPill.dataset.value : "gemini-2.5-flash";
+            const activeTonePill = document.querySelector("#settingsToneSelect .select-pill.active");
+            const tone = activeTonePill ? activeTonePill.dataset.value : "reflective";
+
+            // Google OAuth Client ID & AdSense
+            const gClientId = document.getElementById("inputGoogleClientId")?.value.trim();
+            const adsensePub = document.getElementById("inputAdSensePubId")?.value.trim();
+            if (gClientId) localStorage.setItem("mylyfe_google_client_id", gClientId);
+            if (adsensePub) localStorage.setItem("mylyfe_adsense_pub", adsensePub);
+
+            geminiService.setApiKey(key);
+            geminiService.setModel(model);
+            geminiService.setTone(tone);
+
+            document.getElementById("modalGeminiSettings").classList.remove("open");
+            showToast("Settings applied & saved securely");
+        });
+    }
 
     const btnTestConn = document.getElementById("btnTestGeminiConnection");
     if (btnTestConn) {
@@ -2965,5 +3654,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateKeyStatusUI();
     switchSection("chat");
 });
+
 
 

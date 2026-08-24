@@ -3813,5 +3813,407 @@ body {
     font-weight: 700;
 }
 
+/* ---------------------------------------------------------
+   Header Pill Controls (Language, Theme, Phone View, Wizard)
+   --------------------------------------------------------- */
+.header-control-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 2px 10px;
+    backdrop-filter: blur(16px);
+}
+
+.header-select {
+    background: transparent;
+    border: none;
+    color: #f8fafc;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    outline: none;
+    cursor: pointer;
+}
+
+.header-select option {
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+.btn-tool-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-tool-pill:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #d4af37;
+    transform: translateY(-1px);
+}
+
+.btn-wizard-pill {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(184, 147, 90, 0.15));
+    border-color: #d4af37;
+    color: #fef08a;
+}
+
+.footer-legal-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 10px;
+}
+
+.link-legal {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.link-legal:hover {
+    color: #d4af37;
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------------
+   Category QR Bar & Buttons in Chat
+   --------------------------------------------------------- */
+.chat-category-qr-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.chat-category-qr-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.qr-bar-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.category-qr-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-cat-qr {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.btn-cat-qr:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+    color: #fef08a;
+}
+
+.btn-add-person-qr {
+    margin-left: auto;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(22, 163, 74, 0.15));
+    border: 1px solid #22c55e;
+    color: #86efac;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.btn-add-person-qr:hover {
+    background: #22c55e;
+    color: #060e18;
+}
+
+/* ---------------------------------------------------------
+   TinyURL Marketing Generator Card
+   --------------------------------------------------------- */
+.tinyurl-campaign-card {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(184, 147, 90, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.tinyurl-result-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid #d4af37;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 10px;
+}
+
+.tinyurl-result-row.hidden {
+    display: none;
+}
+
+.tinyurl-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #fef08a;
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------
+   First-Time Onboarding Wizard Multi-Step UI
+   --------------------------------------------------------- */
+.modal-wizard {
+    max-width: 540px;
+}
+
+.wizard-progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.wizard-step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.wizard-step-dot.active {
+    background: #d4af37;
+    border-color: #fef08a;
+    color: #060e18;
+    box-shadow: 0 0 16px rgba(212, 175, 55, 0.6);
+}
+
+.wizard-step-dot.completed {
+    background: #22c55e;
+    border-color: #86efac;
+    color: #060e18;
+}
+
+.wizard-step-line {
+    flex: 1;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0 6px;
+}
+
+.wizard-step-pane {
+    display: none;
+}
+
+.wizard-step-pane.active {
+    display: block;
+    animation: fadeInTab 0.3s ease;
+}
+
+.wizard-header {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.wizard-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #d4af37;
+    text-transform: uppercase;
+}
+
+.wizard-title {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 4px 0 6px 0;
+}
+
+.wizard-subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.wizard-footer-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 16px;
+}
+
+/* ---------------------------------------------------------
+   Google Play Store Legal Modals
+   --------------------------------------------------------- */
+.legal-content-scroll {
+    max-height: 380px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    text-align: left;
+    font-size: 13px;
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+.legal-content-scroll h4 {
+    font-family: 'Cinzel', serif;
+    color: #fef08a;
+    margin: 16px 0 6px 0;
+}
+
+.legal-content-scroll h4:first-child {
+    margin-top: 0;
+}
+
+.data-safety-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.data-safety-table th, .data-safety-table td {
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: left;
+}
+
+.data-safety-table th {
+    background: rgba(212, 175, 55, 0.15);
+    color: #fef08a;
+}
+
+/* ---------------------------------------------------------
+   Theme Engine (4 Curated Luxury Themes)
+   --------------------------------------------------------- */
+/* 1. Apple Dark Luxe (Default) */
+body[data-theme="apple-luxe"] {
+    --bg-primary: #060e18;
+    --card-bg: rgba(15, 23, 42, 0.7);
+    --border-color: rgba(212, 175, 55, 0.35);
+    --accent-gold: #d4af37;
+}
+
+/* 2. Emerald Zen */
+body[data-theme="emerald-zen"] {
+    --bg-primary: #041812;
+    --card-bg: rgba(6, 44, 34, 0.75);
+    --border-color: rgba(52, 211, 153, 0.4);
+    --accent-gold: #34d399;
+}
+body[data-theme="emerald-zen"] .binder-brand .binder-monogram,
+body[data-theme="emerald-zen"] .header-icon-badge {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+}
+
+/* 3. Cyber Velvet */
+body[data-theme="cyber-velvet"] {
+    --bg-primary: #120726;
+    --card-bg: rgba(30, 15, 60, 0.8);
+    --border-color: rgba(192, 132, 252, 0.4);
+    --accent-gold: #c084fc;
+}
+body[data-theme="cyber-velvet"] .binder-brand .binder-monogram,
+body[data-theme="cyber-velvet"] .header-icon-badge {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #ffffff;
+}
+
+/* 4. Amber Sunset */
+body[data-theme="amber-sunset"] {
+    --bg-primary: #1c0f06;
+    --card-bg: rgba(45, 22, 10, 0.8);
+    --border-color: rgba(251, 146, 60, 0.4);
+    --accent-gold: #fb923c;
+}
+body[data-theme="amber-sunset"] .binder-brand .binder-monogram,
+body[data-theme="amber-sunset"] .header-icon-badge {
+    background: linear-gradient(135deg, #ea580c, #f97316);
+    color: #ffffff;
+}
+
+/* ---------------------------------------------------------
+   Interactive Mobile Phone App Frame Mode
+   --------------------------------------------------------- */
+body.device-frame-active {
+    background: #020617;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+body.device-frame-active .ledger-app {
+    width: 390px !important;
+    height: 844px !important;
+    border-radius: 50px !important;
+    border: 12px solid #1e293b !important;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9), 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+    overflow: hidden !important;
+    position: relative !important;
+    margin: 0 auto;
+}
+
+body.device-frame-active .binder-rail {
+    display: none !important;
+}
+
+body.device-frame-active .mobile-binder-bar {
+    display: flex !important;
+}
+
+
 
 
