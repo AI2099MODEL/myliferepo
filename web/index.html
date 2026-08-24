@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledger — Personal Offline Binder & Organizer</title>
+    <meta name="description" content="Personal offline notebook, organizer, and binder for threads, journal diary, calendar events, vault documents, and task checklists.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="ledger-app" id="ledgerApp">
+        <!-- Desktop Binder Spine / Navigation Rail -->
+        <aside class="binder-rail" id="binderRail">
+            <div class="binder-brand">
+                <div class="binder-monogram">L</div>
+                <div class="binder-title-text">
+                    <span class="binder-name">LEDGER</span>
+                    <span class="binder-edition">EST. 2026</span>
+                </div>
+            </div>
+
+            <nav class="binder-tabs">
+                <button class="rail-tab active" data-section="chat" id="railTabChat">
+                    <span class="tab-icon">💬</span>
+                    <span class="tab-label">Chat</span>
+                    <span class="tab-brass-indicator"></span>
+                </button>
+                <button class="rail-tab" data-section="diary" id="railTabDiary">
+                    <span class="tab-icon">📖</span>
+                    <span class="tab-label">Diary</span>
+                    <span class="tab-brass-indicator"></span>
+                </button>
+                <button class="rail-tab" data-section="events" id="railTabEvents">
+                    <span class="tab-icon">📅</span>
+                    <span class="tab-label">Events</span>
+                    <span class="tab-brass-indicator"></span>
+                </button>
+                <button class="rail-tab" data-section="vault" id="railTabVault">
+                    <span class="tab-icon">🔒</span>
+                    <span class="tab-label">Vault</span>
+                    <span class="tab-brass-indicator"></span>
+                </button>
+                <button class="rail-tab" data-section="tasks" id="railTabTasks">
+                    <span class="tab-icon">✓</span>
+                    <span class="tab-label">Tasks</span>
+                    <span class="tab-brass-indicator"></span>
+                </button>
+                <button class="rail-tab rail-tab-stitch" data-section="stitch" id="railTabStitch">
+                    <span class="tab-icon">🧵</span>
+                    <span class="tab-label">Stitch AI</span>
+                    <span class="tab-brass-indicator"></span>
+                </button>
+                <button class="rail-tab rail-tab-gemini" data-section="gemini" id="railTabGemini">
+                    <span class="tab-icon">✦</span>
+                    <span class="tab-label">Gemini Studio</span>
+                    <span class="tab-brass-indicator"></span>
+                </button>
+            </nav>
+
+            <div class="binder-footer-status">
+                <div class="status-row">
+                    <div class="status-indicator-dot"></div>
+                    <span class="status-text">LOCAL STORAGE ACTIVE</span>
+                </div>
+                <button class="btn-gemini-key-gear" id="btnOpenGeminiSettings" title="Configure Google Gemini AI Studio API Key">
+                    <span class="gemini-sparkle">✦</span>
+                    <span>AI Settings</span>
+                    <span class="key-status-dot" id="keyStatusDot"></span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Ledger Canvas -->
+        <main class="ledger-main">
+            <!-- Top Ledger Ink Header -->
+            <header class="ledger-header" id="ledgerHeader">
+                <div class="header-branding">
+                    <div class="header-icon-badge">L</div>
+                    <div>
+                        <h1 class="header-title" id="headerTitle">Ledger Threads</h1>
+                        <p class="header-subtitle" id="headerSubtitle">Encrypted local messaging • Local Room Persistence</p>
+                    </div>
+                </div>
+                <div class="header-actions" id="headerActions">
+                    <!-- Dynamic action buttons injected per section -->
+                    <button class="btn-stitch-toggle" id="btnToggleStitchInline" title="Toggle Google Stitch AI Design for this section">
+                        <span>✨ Stitch AI View</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Active Section Content Area -->
+            <div class="ledger-viewport">
+                <!-- Inline Stitch AI Design Overlay Container -->
+                <div class="stitch-preview-container" id="inlineStitchContainer">
+                    <div class="stitch-preview-banner">
+                        <div>
+                            <span class="stitch-banner-tag">🧵 GOOGLE STITCH AI DESIGN</span>
+                            <span class="stitch-banner-sub" id="inlineStitchSub">Active Section: Chat</span>
+                        </div>
+                        <button class="btn-stitch-toggle active" id="btnCloseStitchInline">
+                            <span>✕ Return to App</span>
+                        </button>
+                    </div>
+                    <iframe class="stitch-design-frame" id="inlineStitchFrame" src="stitch-designs/downloaded/chat.html" title="Google Stitch AI Design"></iframe>
+                </div>
+
+                <!-- SECTION 1: CHAT -->
+                <section class="section-pane active" id="sectionChat" data-section="chat">
+                    <div class="threads-bar">
+                        <div class="threads-list" id="threadsList">
+                            <!-- Thread tabs rendered dynamically -->
+                        </div>
+                        <button class="btn-new-thread-pill" id="btnOpenNewThreadModal">
+                            <span>+</span> New Thread
+                        </button>
+                    </div>
+                    <div class="thread-info-banner" id="threadInfoBanner">
+                        <span class="banner-thread-name" id="bannerThreadName">Active: Family (Family)</span>
+                        <span class="banner-thread-count" id="bannerThreadCount">3 msgs</span>
+                    </div>
+                    <div class="chat-messages-container" id="chatMessagesContainer">
+                        <!-- Messages dynamically rendered here -->
+                    </div>
+                    <div class="chat-composer">
+                        <input type="text" id="chatInput" class="ledger-input chat-input" placeholder="Write a note in this thread..." autocomplete="off">
+                        <button class="btn-send-message" id="btnSendMessage" title="Send message">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: DIARY -->
+                <section class="section-pane" id="sectionDiary" data-section="diary">
+                    <div class="diary-toolbar">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="diarySearchInput" class="ledger-input search-input" placeholder="Search journal entries...">
+                            <button class="btn-clear-search" id="btnClearDiarySearch">✕</button>
+                        </div>
+                        <div class="tag-filters-row" id="diaryTagFilters">
+                            <button class="tag-pill active" data-tag="All">All</button>
+                            <button class="tag-pill" data-tag="Reflection">Reflection</button>
+                            <button class="tag-pill" data-tag="Milestone">Milestone</button>
+                            <button class="tag-pill" data-tag="Deep Thought">Deep Thought</button>
+                            <button class="tag-pill" data-tag="Gratitude">Gratitude</button>
+                            <button class="tag-pill" data-tag="Ideas">Ideas</button>
+                            <button class="tag-pill" data-tag="Daily">Daily</button>
+                        </div>
+                        <button class="btn-ai-sparkle-pill" id="btnOpenDiaryAiReflection" title="Analyze journal reflections with Gemini">
+                            <span>✦ AI Reflection</span>
+                        </button>
+                    </div>
+                    <div class="diary-entries-grid" id="diaryEntriesContainer">
+                        <!-- Diary cards rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- SECTION 3: EVENTS -->
+                <section class="section-pane" id="sectionEvents" data-section="events">
+                    <div class="events-toolbar">
+                        <div class="filter-pills-row" id="eventFilterRow">
+                            <button class="filter-pill active" data-filter="All" id="eventFilterAll">All (0)</button>
+                            <button class="filter-pill" data-filter="Upcoming" id="eventFilterUpcoming">Upcoming (0)</button>
+                            <button class="filter-pill" data-filter="Past" id="eventFilterPast">Past (0)</button>
+                        </div>
+                    </div>
+                    <div class="events-list-container" id="eventsListContainer">
+                        <!-- Event items rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- SECTION 4: VAULT -->
+                <section class="section-pane" id="sectionVault" data-section="vault">
+                    <div class="vault-toolbar">
+                        <div class="category-pills-row" id="vaultCategoryRow">
+                            <button class="category-pill active" data-category="All">All</button>
+                            <button class="category-pill" data-category="ID">ID</button>
+                            <button class="category-pill" data-category="Finance">Finance</button>
+                            <button class="category-pill" data-category="Legal">Legal</button>
+                            <button class="category-pill" data-category="Insurance">Insurance</button>
+                            <button class="category-pill" data-category="Health">Health</button>
+                            <button class="category-pill" data-category="Receipts">Receipts</button>
+                            <button class="category-pill" data-category="Personal">Personal</button>
+                        </div>
+                        <button class="btn-ai-sparkle-pill" id="btnOpenVaultAiInsights" title="Analyze vault documents with Gemini">
+                            <span>✦ Vault AI Insights</span>
+                        </button>
+                    </div>
+                    <div class="vault-grid" id="vaultGridContainer">
+                        <!-- Vault document cards rendered dynamically -->
+                    </div>
+                </section>
+
+                <!-- SECTION 5: TASKS -->
+                <section class="section-pane" id="sectionTasks" data-section="tasks">
+                    <div class="tasks-toolbar">
+                        <div class="priority-pills-row" id="tasksPriorityRow">
+                            <button class="priority-pill active" data-priority="All">All (0)</button>
+                            <button class="priority-pill" data-priority="HIGH">HIGH (0)</button>
+                            <button class="priority-pill" data-priority="MED">MED (0)</button>
+                            <button class="priority-pill" data-priority="LOW">LOW (0)</button>
+                        </div>
+                        <button class="btn-ai-sparkle-pill" id="btnOpenTaskAiBreakdown" title="Break down complex goals into tasks with Gemini">
+                            <span>✦ AI Task Breakdown</span>
+                        </button>
+                    </div>
+                    <div class="tasks-list-wrapper">
+                        <div class="tasks-group" id="activeTasksContainer">
+                            <!-- Active task cards -->
+                        </div>
+                        <div class="completed-tasks-accordion" id="completedTasksAccordion">
+                            <div class="accordion-header" id="btnToggleCompletedTasks">
+                                <span class="accordion-title" id="completedTasksTitle">Completed (0)</span>
+                                <span class="accordion-arrow" id="completedAccordionArrow">▼</span>
+                            </div>
+                            <div class="accordion-content" id="completedTasksContainer">
+                                <!-- Completed task cards -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 6: GOOGLE STITCH AI STUDIO -->
+                <section class="section-pane" id="sectionStitch" data-section="stitch">
+                    <div class="stitch-container">
+                        <!-- Stitch Header Banner -->
+                        <div class="stitch-hero">
+                            <div class="stitch-hero-content">
+                                <div class="stitch-badge">
+                                    <span class="stitch-sparkle">✨</span>
+                                    <span>GOOGLE STITCH AI INTEGRATION</span>
+                                    <span class="stitch-project-pill">Project #15672949592124108526</span>
+                                </div>
+                                <h2 class="stitch-title">Stitch UI Design Studio</h2>
+                                <p class="stitch-desc">AI-generated high-fidelity designs created via Google Stitch SDK (@google/stitch-sdk) with natural language prompts and bespoke vintage binder aesthetic tokens.</p>
+                            </div>
+                            <div class="stitch-hero-stats">
+                                <div class="stitch-stat-box">
+                                    <span class="stat-num">5 / 5</span>
+                                    <span class="stat-lbl">Screens Generated</span>
+                                </div>
+                                <div class="stitch-stat-box">
+                                    <span class="stat-num">100%</span>
+                                    <span class="stat-lbl">SDK Sync Complete</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stitch Screen Tabs Selector -->
+                        <div class="stitch-nav-bar">
+                            <div class="stitch-screen-pills" id="stitchScreenPills">
+                                <button class="stitch-screen-btn active" data-stitch-screen="chat">
+                                    <span class="btn-icon">💬</span>
+                                    <span>Chat Design</span>
+                                </button>
+                                <button class="stitch-screen-btn" data-stitch-screen="diary">
+                                    <span class="btn-icon">📖</span>
+                                    <span>Diary Design</span>
+                                </button>
+                                <button class="stitch-screen-btn" data-stitch-screen="events">
+                                    <span class="btn-icon">📅</span>
+                                    <span>Events Design</span>
+                                </button>
+                                <button class="stitch-screen-btn" data-stitch-screen="vault">
+                                    <span class="btn-icon">🔒</span>
+                                    <span>Vault Design</span>
+                                </button>
+                                <button class="stitch-screen-btn" data-stitch-screen="tasks">
+                                    <span class="btn-icon">✓</span>
+                                    <span>Tasks Design</span>
+                                </button>
+                            </div>
+
+                            <div class="stitch-view-mode-toggle">
+                                <button class="view-mode-btn active" data-view-mode="iframe" id="btnViewIframe" title="Interactive HTML view generated by Stitch">
+                                    <span>🖥️ Live HTML</span>
+                                </button>
+                                <button class="view-mode-btn" data-view-mode="image" id="btnViewImage" title="High-res screenshot preview from Stitch">
+                                    <span>🖼️ High-Res Image</span>
+                                </button>
+                                <button class="view-mode-btn" data-view-mode="prompt" id="btnViewPrompt" title="Prompt & API details">
+                                    <span>📝 Prompt Info</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stitch Content Area -->
+                        <div class="stitch-viewport-box">
+                            <!-- Mode 1: Interactive HTML Iframe -->
+                            <div class="stitch-display-pane active" id="stitchIframePane">
+                                <div class="stitch-frame-toolbar">
+                                    <span class="frame-url" id="stitchCurrentFileLabel">stitch-designs/downloaded/chat.html</span>
+                                    <div class="frame-tools">
+                                        <button class="btn-frame-tool" id="btnOpenNewTab" title="Open in new window">↗ Open Full Screen</button>
+                                        <button class="btn-frame-tool" id="btnReloadFrame" title="Reload iframe">↻ Reload</button>
+                                    </div>
+                                </div>
+                                <div class="stitch-iframe-wrapper">
+                                    <iframe id="stitchIframe" src="stitch-designs/downloaded/chat.html" title="Google Stitch AI Generated UI"></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Mode 2: Screenshot Image View -->
+                            <div class="stitch-display-pane" id="stitchImagePane">
+                                <div class="stitch-image-wrapper">
+                                    <img id="stitchPreviewImg" src="stitch-designs/downloaded/chat.png" alt="Stitch AI Mockup Preview">
+                                </div>
+                            </div>
+
+                            <!-- Mode 3: Prompt & Metadata View -->
+                            <div class="stitch-display-pane" id="stitchPromptPane">
+                                <div class="prompt-inspector-card">
+                                    <div class="prompt-header">
+                                        <h3 id="stitchPromptScreenTitle">Ledger Chat — Stitch Prompt</h3>
+                                        <span class="badge-screen-id" id="stitchScreenIdBadge">Screen ID: ee9a9d72350646f282a781bc87b86e94</span>
+                                    </div>
+                                    <label class="prompt-lbl">Natural Language Prompt Sent to Stitch API</label>
+                                    <div class="prompt-text-box" id="stitchPromptText"></div>
+                                    <div class="prompt-actions-bar">
+                                        <button class="btn-copy-prompt" id="btnCopyPrompt">📋 Copy Prompt</button>
+                                        <a id="linkGoogleStitchCdn" href="#" target="_blank" class="btn-cdn-link">🌐 View on Google CDN</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 7: GOOGLE GEMINI AI STUDIO -->
+                <section class="section-pane" id="sectionGemini" data-section="gemini">
+                    <div class="gemini-container">
+                        <!-- Gemini Header Banner -->
+                        <div class="gemini-hero">
+                            <div class="gemini-hero-content">
+                                <div class="gemini-badge">
+                                    <span class="gemini-sparkle">✦</span>
+                                    <span>GOOGLE GEMINI AI STUDIO</span>
+                                    <span class="gemini-model-pill" id="geminiActiveModelBadge">gemini-2.5-flash</span>
+                                </div>
+                                <h2 class="gemini-title">Gemini Intelligence Studio</h2>
+                                <p class="gemini-desc">State-of-the-art multimodal reasoning across your entire personal binder. Query chats, summarize journal reflections, auto-prioritize tasks, and draft thoughts.</p>
+                            </div>
+                            <div class="gemini-hero-stats">
+                                <div class="gemini-stat-box">
+                                    <span class="stat-num" id="geminiApiStatusIndicator">ACTIVE</span>
+                                    <span class="stat-lbl" id="geminiKeyStatusText">Connected</span>
+                                </div>
+                                <button class="btn-hero-gemini-config" id="btnHeroOpenSettings">⚙️ AI Settings</button>
+                            </div>
+                        </div>
+
+                        <!-- Prompt Preset Pills -->
+                        <div class="gemini-presets-bar">
+                            <span class="presets-label">Quick Prompts:</span>
+                            <button class="gemini-preset-btn" data-preset="summarize-binder">
+                                <span>📚 Summarize Entire Binder</span>
+                            </button>
+                            <button class="gemini-preset-btn" data-preset="weekly-insights">
+                                <span>🌿 Journal Reflection & Mood</span>
+                            </button>
+                            <button class="gemini-preset-btn" data-preset="action-items">
+                                <span>✓ Extract Tasks from Diary</span>
+                            </button>
+                            <button class="gemini-preset-btn" data-preset="plan-week">
+                                <span>📅 Create Weekly Schedule</span>
+                            </button>
+                            <button class="gemini-preset-btn" data-preset="audit-vault">
+                                <span>🔒 Vault Security Check</span>
+                            </button>
+                        </div>
+
+                        <!-- Studio Playground Layout -->
+                        <div class="gemini-studio-grid">
+                            <!-- Left: Prompt Editor & Controls -->
+                            <div class="gemini-prompt-card">
+                                <div class="card-head">
+                                    <div class="head-left">
+                                        <span class="card-icon">⚡</span>
+                                        <span class="card-title">Prompt & Context Builder</span>
+                                    </div>
+                                    <div class="model-select-wrapper">
+                                        <select id="selectGeminiModel" class="gemini-select">
+                                            <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (Fast & Smart)</option>
+                                            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Reasoning)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="context-toggles-bar">
+                                    <span class="ctx-bar-label">Inject Context:</span>
+                                    <label class="context-pill">
+                                        <input type="checkbox" id="checkCtxChat" checked>
+                                        <span>💬 Chat</span>
+                                    </label>
+                                    <label class="context-pill">
+                                        <input type="checkbox" id="checkCtxDiary" checked>
+                                        <span>📖 Diary</span>
+                                    </label>
+                                    <label class="context-pill">
+                                        <input type="checkbox" id="checkCtxEvents" checked>
+                                        <span>📅 Events</span>
+                                    </label>
+                                    <label class="context-pill">
+                                        <input type="checkbox" id="checkCtxVault" checked>
+                                        <span>🔒 Vault</span>
+                                    </label>
+                                    <label class="context-pill">
+                                        <input type="checkbox" id="checkCtxTasks" checked>
+                                        <span>✓ Tasks</span>
+                                    </label>
+                                </div>
+
+                                <div class="prompt-input-wrapper">
+                                    <textarea id="geminiPromptInput" class="gemini-textarea" placeholder="Ask Gemini anything about your notes, brainstorm ideas, request summaries, or draft plans..."></textarea>
+                                </div>
+
+                                <div class="prompt-bottom-bar">
+                                    <div class="temp-control">
+                                        <span class="temp-lbl">Creativity:</span>
+                                        <input type="range" id="geminiTempSlider" min="0" max="1" step="0.1" value="0.7">
+                                        <span class="temp-val" id="geminiTempVal">0.7</span>
+                                    </div>
+                                    <div class="prompt-buttons">
+                                        <button class="btn-clear-prompt" id="btnClearGeminiPrompt">Clear</button>
+                                        <button class="btn-run-gemini" id="btnRunGemini">
+                                            <span class="btn-sparkle">✦</span>
+                                            <span>Generate with Gemini</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Response Console -->
+                            <div class="gemini-response-card">
+                                <div class="card-head">
+                                    <div class="head-left">
+                                        <span class="card-icon">✦</span>
+                                        <span class="card-title">Gemini Response Console</span>
+                                    </div>
+                                    <div class="response-tools">
+                                        <button class="btn-tool-mini" id="btnCopyGeminiResponse" title="Copy response">📋 Copy</button>
+                                        <button class="btn-tool-mini" id="btnClearGeminiResponse" title="Clear">✕</button>
+                                    </div>
+                                </div>
+
+                                <div class="response-viewport" id="geminiResponseContainer">
+                                    <div class="response-placeholder">
+                                        <div class="placeholder-icon">✦</div>
+                                        <div class="placeholder-title">Ready for Gemini AI Prompts</div>
+                                        <div class="placeholder-sub">Choose a preset prompt or type your instructions above to analyze your binder data with Google Gemini AI Studio.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Mobile Bottom Binder Bar -->
+            <nav class="mobile-binder-bar" id="mobileBinderBar">
+                <button class="mobile-tab active" data-section="chat" id="mobTabChat">
+                    <span class="mob-tab-indicator"></span>
+                    <span class="mob-icon">💬</span>
+                    <span class="mob-label">Chat</span>
+                </button>
+                <button class="mobile-tab" data-section="diary" id="mobTabDiary">
+                    <span class="mob-tab-indicator"></span>
+                    <span class="mob-icon">📖</span>
+                    <span class="mob-label">Diary</span>
+                </button>
+                <button class="mobile-tab" data-section="events" id="mobTabEvents">
+                    <span class="mob-tab-indicator"></span>
+                    <span class="mob-icon">📅</span>
+                    <span class="mob-label">Events</span>
+                </button>
+                <button class="mobile-tab" data-section="vault" id="mobTabVault">
+                    <span class="mob-tab-indicator"></span>
+                    <span class="mob-icon">🔒</span>
+                    <span class="mob-label">Vault</span>
+                </button>
+                <button class="mobile-tab" data-section="tasks" id="mobTabTasks">
+                    <span class="mob-tab-indicator"></span>
+                    <span class="mob-icon">✓</span>
+                    <span class="mob-label">Tasks</span>
+                </button>
+                <button class="mobile-tab" data-section="stitch" id="mobTabStitch">
+                    <span class="mob-tab-indicator"></span>
+                    <span class="mob-icon">🧵</span>
+                    <span class="mob-label">Stitch</span>
+                </button>
+                <button class="mobile-tab" data-section="gemini" id="mobTabGemini">
+                    <span class="mob-tab-indicator"></span>
+                    <span class="mob-icon">✦</span>
+                    <span class="mob-label">Gemini</span>
+                </button>
+            </nav>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- New Thread Modal -->
+    <div class="modal-overlay" id="modalNewThread">
+        <div class="ledger-modal">
+            <h3 class="modal-title">New Ledger Thread</h3>
+            <div class="form-group">
+                <label>Thread Name</label>
+                <input type="text" id="inputThreadName" class="ledger-input" placeholder="e.g. Architecture Notes">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <div class="modal-pills-select" id="threadCategorySelect">
+                    <button class="select-pill active" data-value="Personal">Personal</button>
+                    <button class="select-pill" data-value="Work">Work</button>
+                    <button class="select-pill" data-value="Family">Family</button>
+                    <button class="select-pill" data-value="Projects">Projects</button>
+                    <button class="select-pill" data-value="Finance">Finance</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Emoji Icon</label>
+                <div class="modal-emojis-select" id="threadEmojiSelect">
+                    <button class="emoji-opt active" data-emoji="🌿">🌿</button>
+                    <button class="emoji-opt" data-emoji="💼">💼</button>
+                    <button class="emoji-opt" data-emoji="🏡">🏡</button>
+                    <button class="emoji-opt" data-emoji="🚀">🚀</button>
+                    <button class="emoji-opt" data-emoji="💡">💡</button>
+                    <button class="emoji-opt" data-emoji="☕">☕</button>
+                    <button class="emoji-opt" data-emoji="📚">📚</button>
+                    <button class="emoji-opt" data-emoji="🎯">🎯</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseNewThreadModal">Cancel</button>
+                <button class="btn-primary" id="btnConfirmNewThread">Create Thread</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New / Edit Diary Modal -->
+    <div class="modal-overlay" id="modalDiary">
+        <div class="ledger-modal">
+            <h3 class="modal-title" id="diaryModalTitle">New Diary Entry</h3>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="inputDiaryTitle" class="ledger-input" placeholder="Entry Heading">
+            </div>
+            <div class="form-group">
+                <label>Entry Body</label>
+                <textarea id="inputDiaryBody" class="ledger-input ledger-textarea" placeholder="Write your reflections, notes, or memories..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Tag / Category</label>
+                <div class="modal-pills-select" id="diaryTagSelect">
+                    <button class="select-pill active" data-value="Reflection">Reflection</button>
+                    <button class="select-pill" data-value="Milestone">Milestone</button>
+                    <button class="select-pill" data-value="Deep Thought">Deep Thought</button>
+                    <button class="select-pill" data-value="Gratitude">Gratitude</button>
+                    <button class="select-pill" data-value="Ideas">Ideas</button>
+                    <button class="select-pill" data-value="Daily">Daily</button>
+                </div>
+            </div>
+            <div class="form-group form-checkbox-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="checkDiaryPinned">
+                    <span class="custom-checkbox"></span>
+                    <span class="checkbox-text">Pin this entry to the top</span>
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseDiaryModal">Cancel</button>
+                <button class="btn-primary" id="btnSaveDiaryEntry">Save Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Event Modal -->
+    <div class="modal-overlay" id="modalEvent">
+        <div class="ledger-modal">
+            <h3 class="modal-title">Schedule Event</h3>
+            <div class="form-group">
+                <label>Event Title</label>
+                <input type="text" id="inputEventTitle" class="ledger-input" placeholder="e.g. Strategy Review">
+            </div>
+            <div class="form-group">
+                <label>Location or Note</label>
+                <input type="text" id="inputEventLocation" class="ledger-input" placeholder="e.g. Studio Room B or Video Call">
+            </div>
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label>Date</label>
+                    <input type="date" id="inputEventDate" class="ledger-input">
+                </div>
+                <div class="form-group flex-1">
+                    <label>Time</label>
+                    <input type="time" id="inputEventTime" class="ledger-input">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <div class="modal-pills-select" id="eventCategorySelect">
+                    <button class="select-pill active" data-value="General">General</button>
+                    <button class="select-pill" data-value="Work">Work</button>
+                    <button class="select-pill" data-value="Personal">Personal</button>
+                    <button class="select-pill" data-value="Finance">Finance</button>
+                </div>
+            </div>
+            <div class="form-group form-checkbox-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="checkEventNotify" checked>
+                    <span class="custom-checkbox"></span>
+                    <span class="checkbox-text">Notify me with reminder</span>
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseEventModal">Cancel</button>
+                <button class="btn-primary" id="btnSaveEvent">Schedule Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Vault Document Modal -->
+    <div class="modal-overlay" id="modalVault">
+        <div class="ledger-modal">
+            <h3 class="modal-title">Add Document to Vault</h3>
+            <div class="form-group">
+                <label>Document Title</label>
+                <input type="text" id="inputVaultTitle" class="ledger-input" placeholder="e.g. Passport Scan 2026">
+            </div>
+            <div class="form-group">
+                <label>File Name</label>
+                <input type="text" id="inputVaultFileName" class="ledger-input" placeholder="passport_2026.pdf">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <div class="modal-pills-select" id="vaultCategorySelect">
+                    <button class="select-pill active" data-value="ID">ID</button>
+                    <button class="select-pill" data-value="Finance">Finance</button>
+                    <button class="select-pill" data-value="Legal">Legal</button>
+                    <button class="select-pill" data-value="Insurance">Insurance</button>
+                    <button class="select-pill" data-value="Health">Health</button>
+                    <button class="select-pill" data-value="Receipts">Receipts</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Document Type</label>
+                <div class="modal-pills-select" id="vaultTypeSelect">
+                    <button class="select-pill active" data-value="PDF">PDF</button>
+                    <button class="select-pill" data-value="IMAGE">IMAGE</button>
+                    <button class="select-pill" data-value="DOC">DOC</button>
+                    <button class="select-pill" data-value="CERTIFICATE">CERTIFICATE</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes / Policy Number</label>
+                <textarea id="inputVaultNotes" class="ledger-input ledger-textarea small" placeholder="Reference details, policy numbers..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseVaultModal">Cancel</button>
+                <button class="btn-primary" id="btnSaveVaultDoc">Save to Vault</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Task Modal -->
+    <div class="modal-overlay" id="modalTask">
+        <div class="ledger-modal">
+            <h3 class="modal-title">New Ledger Task</h3>
+            <div class="form-group">
+                <label>Task Title</label>
+                <input type="text" id="inputTaskTitle" class="ledger-input" placeholder="e.g. Audit ledger balance sheet">
+            </div>
+            <div class="form-group">
+                <label>Description / Details</label>
+                <textarea id="inputTaskDesc" class="ledger-input ledger-textarea small" placeholder="Additional instructions or notes..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Priority Level</label>
+                <div class="priority-select-row" id="taskPrioritySelect">
+                    <button class="priority-opt-btn" data-priority="HIGH">HIGH</button>
+                    <button class="priority-opt-btn active" data-priority="MED">MED</button>
+                    <button class="priority-opt-btn" data-priority="LOW">LOW</button>
+                </div>
+            </div>
+            <div class="form-group form-checkbox-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="checkTaskSchedule">
+                    <span class="custom-checkbox"></span>
+                    <span class="checkbox-text">Set Due Date & Time</span>
+                </label>
+            </div>
+            <div class="form-row hidden" id="taskDateTimeRow">
+                <div class="form-group flex-1">
+                    <label>Due Date</label>
+                    <input type="date" id="inputTaskDate" class="ledger-input">
+                </div>
+                <div class="form-group flex-1">
+                    <label>Due Time</label>
+                    <input type="time" id="inputTaskTime" class="ledger-input">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseTaskModal">Cancel</button>
+                <button class="btn-primary" id="btnSaveTask">Add Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gemini AI Studio Settings Modal -->
+    <div class="modal-overlay" id="modalGeminiSettings">
+        <div class="ledger-modal modal-gemini">
+            <div class="modal-gemini-header">
+                <div class="gemini-sparkle-icon">✦</div>
+                <div>
+                    <h3 class="modal-title">Google Gemini AI Studio Settings</h3>
+                    <p class="modal-subtitle">Power intelligent search, reflections, and task breakdowns across Ledger.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label-row">
+                    <label>Google AI Studio API Key</label>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-get-key">Get Free API Key ↗</a>
+                </div>
+                <div class="input-with-action">
+                    <input type="password" id="inputGeminiApiKey" class="ledger-input font-mono" placeholder="AIzaSy...">
+                    <button class="btn-input-eye" id="btnToggleApiKeyVisibility" title="Toggle visibility">👁</button>
+                </div>
+                <span class="field-hint">Your API key is stored securely in your browser's local storage and used only for direct calls to Google Gemini API.</span>
+            </div>
+
+            <div class="form-group">
+                <label>Default Gemini Model</label>
+                <div class="modal-pills-select" id="settingsModelSelect">
+                    <button class="select-pill active" data-value="gemini-2.5-flash">Gemini 2.5 Flash (Fast)</button>
+                    <button class="select-pill" data-value="gemini-1.5-flash">Gemini 1.5 Flash</button>
+                    <button class="select-pill" data-value="gemini-1.5-pro">Gemini 1.5 Pro (Deep)</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>AI Assistant Tone & Persona</label>
+                <div class="modal-pills-select" id="settingsToneSelect">
+                    <button class="select-pill active" data-value="reflective">Reflective & Warm</button>
+                    <button class="select-pill" data-value="concise">Structured & Concise</button>
+                    <button class="select-pill" data-value="coach">Productivity Coach</button>
+                    <button class="select-pill" data-value="executive">Executive Analyst</button>
+                </div>
+            </div>
+
+            <div class="connection-test-row">
+                <button class="btn-test-connection" id="btnTestGeminiConnection">
+                    <span>⚡ Test Connection</span>
+                </button>
+                <span class="connection-status-msg" id="connectionStatusMsg">Not tested</span>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseGeminiSettings">Cancel</button>
+                <button class="btn-primary btn-gemini-save" id="btnSaveGeminiSettings">Save & Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Journal Reflection Modal -->
+    <div class="modal-overlay" id="modalAiReflection">
+        <div class="ledger-modal modal-large">
+            <div class="modal-gemini-header">
+                <div class="gemini-sparkle-icon">🌿</div>
+                <div>
+                    <h3 class="modal-title">Gemini Journal Insights & Reflection</h3>
+                    <p class="modal-subtitle">AI synthesis of your recent diary entries, themes, and emotional cadence.</p>
+                </div>
+            </div>
+
+            <div class="ai-reflection-content" id="aiReflectionContainer">
+                <div class="ai-loading-state">
+                    <div class="ai-pulse-dot"></div>
+                    <span>Consulting Gemini AI Studio...</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseAiReflection">Close</button>
+                <button class="btn-primary" id="btnSaveReflectionAsDiary">
+                    <span>📖 Save as Diary Entry</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Task Breakdown Modal -->
+    <div class="modal-overlay" id="modalAiTaskBreakdown">
+        <div class="ledger-modal modal-large">
+            <div class="modal-gemini-header">
+                <div class="gemini-sparkle-icon">✓</div>
+                <div>
+                    <h3 class="modal-title">Gemini Smart Task Breakdown</h3>
+                    <p class="modal-subtitle">Convert goals and projects into clear, actionable, prioritized steps.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Goal or Project to Break Down</label>
+                <div class="input-with-action">
+                    <input type="text" id="inputBreakdownGoal" class="ledger-input" placeholder="e.g. Prepare for tax season, organize vehicle maintenance...">
+                    <button class="btn-run-breakdown" id="btnGenerateBreakdown">
+                        <span>✦ Break Down</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="breakdown-results-wrapper" id="breakdownResultsContainer">
+                <div class="breakdown-placeholder">
+                    Enter a goal above and click "Break Down" to generate structured tasks with Google Gemini.
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseTaskBreakdown">Close</button>
+                <button class="btn-primary" id="btnAddBreakdownToTasks" disabled>
+                    <span>+ Add Selected to Tasks</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Vault Insights Modal -->
+    <div class="modal-overlay" id="modalAiVaultInsights">
+        <div class="ledger-modal modal-large">
+            <div class="modal-gemini-header">
+                <div class="gemini-sparkle-icon">🔒</div>
+                <div>
+                    <h3 class="modal-title">Gemini Vault Intelligence & Audit</h3>
+                    <p class="modal-subtitle">Document categorization audit, missing coverage check, and key extraction.</p>
+                </div>
+            </div>
+
+            <div class="ai-vault-content" id="aiVaultContainer">
+                <div class="ai-loading-state">
+                    <div class="ai-pulse-dot"></div>
+                    <span>Auditing Vault documents with Gemini...</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseVaultInsights">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div class="ledger-toast" id="ledgerToast"></div>
+
+    <script src="app.js"></script>
+    <script src="stitch-toggle.js"></script>
+</body>
+</html>

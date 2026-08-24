@@ -1,0 +1,9 @@
+{
+  "section": "tasks",
+  "name": "Ledger Tasks",
+  "screenId": "a83d796c51f94b79a7b27b5b60481db0",
+  "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2EzMDBjZDQ0MDE5NzQ0YzJiNGI0MTFjMTk0ZWZkNzUwEgsSBxC_ksm6vgsYAZIBJAoKcHJvamVjdF9pZBIWQhQxNTY3Mjk0OTU5MjEyNDEwODUyNg&filename=&opi=96797242",
+  "imageUrl": "https://lh3.googleusercontent.com/aida/AEtjO1V_7stQOxCkdEHLZfl6I__87ikI4QAJ-ZtbctTR70CC_AY3vGnGQKDSxNHvtxM1jrnIdgMg1scEAAFDRJVz_FFathdbyeV192646OFz32MbKElt2qlQnB6Krn5u6N-yP3omYEjq7Rr0gsP7tXDQaWV_R5QNTVtClTxfoIdGG-b7z4Ydy7mlSybovJ1FR-0e4JKXdrT5oWVwVGHvOcuvxD6QwxRhVB69nn2Mz1wOf9fmSQdA06FAvQmZbSau",
+  "prompt": "A task management checklist screen with dark navy background.\nHeader: \"Ledger Tasks ✓\" with progress bar showing completion percentage.\nTask cards with:\nPriority badge (HIGH in red, MED in amber, LOW in green) as left color strip,\ntask title with serif font, description preview, due date with ⏰ icon,\ncircular checkbox (unchecked = gold outline, checked = filled gold with ✓).\nCompleted tasks have strikethrough styling and reduced opacity.\nBottom \"+ Add Task\" floating gold button. Clean vintage binder aesthetic.",
+  "generatedAt": "2026-08-24T11:49:43.313Z"
+}

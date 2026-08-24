@@ -1,0 +1,7 @@
+{
+  "chat": {"html": "chat.html", "status": "generated"},
+  "diary": {"html": "diary.html", "status": "generated"},
+  "events": {"html": "events.html", "status": "generated"},
+  "vault": {"html": "vault.html", "status": "generated"},
+  "tasks": {"html": "tasks.html", "status": "generated"}
+}

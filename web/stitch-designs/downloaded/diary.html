@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ledger Diary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&amp;family=Source+Serif+4:wght@400;600&amp;family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#241a00",
+                        "surface-container-highest": "#293643",
+                        "surface-container-low": "#0f1d29",
+                        "primary": "#b8c8de",
+                        "on-secondary-fixed": "#1d1c17",
+                        "on-primary-fixed": "#0d1d2d",
+                        "secondary-container": "#494741",
+                        "on-secondary-container": "#b9b5ad",
+                        "surface-bright": "#2d3a48",
+                        "on-tertiary-container": "#4f3e00",
+                        "primary-fixed-dim": "#b8c8de",
+                        "on-primary": "#223243",
+                        "secondary": "#cac6be",
+                        "surface-variant": "#293643",
+                        "surface-container-lowest": "#030f1b",
+                        "surface-tint": "#b8c8de",
+                        "error": "#ffb4ab",
+                        "secondary-fixed-dim": "#cac6be",
+                        "secondary-fixed": "#e7e2da",
+                        "on-tertiary": "#3c2f00",
+                        "surface": "#071420",
+                        "surface-container-high": "#1e2b38",
+                        "inverse-on-surface": "#25323e",
+                        "surface-container": "#14212d",
+                        "inverse-surface": "#d6e4f5",
+                        "primary-fixed": "#d4e4fb",
+                        "outline-variant": "#44474c",
+                        "surface-dim": "#071420",
+                        "on-surface": "#d6e4f5",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "tertiary-container": "#cca830",
+                        "tertiary-fixed": "#ffe088",
+                        "primary-container": "#041424",
+                        "on-secondary-fixed-variant": "#494741",
+                        "error-container": "#93000a",
+                        "on-error": "#690005",
+                        "on-surface-variant": "#c4c6cd",
+                        "on-primary-container": "#707f93",
+                        "on-error-container": "#ffdad6",
+                        "background": "#071420",
+                        "on-background": "#d6e4f5",
+                        "tertiary": "#e9c349",
+                        "outline": "#8e9197",
+                        "on-primary-fixed-variant": "#39485a",
+                        "inverse-primary": "#506073",
+                        "on-secondary": "#32302b",
+                        "on-tertiary-fixed-variant": "#574500"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "container-max-width": "1200px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Montserrat"],
+                        "body-lg": ["\"Source Serif 4\""],
+                        "body-md": ["\"Source Serif 4\""],
+                        "title-md": ["EB Garamond"],
+                        "headline-lg": ["EB Garamond"],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "display-lg": ["EB Garamond"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .bg-parchment {
+            background-color: #f5f0e8;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        .text-ink {
+            color: #041424;
+        }
+        .ledger-margin {
+            border-left: 1px solid rgba(147, 0, 10, 0.3);
+            margin-left: 16px;
+            padding-left: 16px;
+        }
+        .bg-navy {
+            background-color: #041424;
+        }
+        .bg-gold {
+            background-color: #D4AF37;
+        }
+        .text-gold {
+            color: #D4AF37;
+        }
+        .bg-amber {
+            background-color: #FFBF00;
+        }
+        .shadow-parchment {
+            box-shadow: 0 4px 12px rgba(0, 8, 16, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        .shadow-fab {
+            box-shadow: 0 4px 12px rgba(0, 8, 16, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        .ribbon {
+            position: absolute;
+            top: -5px;
+            right: 15px;
+            width: 25px;
+            height: 40px;
+            background: #93000a;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .ribbon::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            border-width: 12px 12.5px 0 12.5px;
+            border-style: solid;
+            border-color: #93000a transparent transparent transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-navy text-on-background min-h-screen flex flex-col font-body-md antialiased pb-24 md:pb-8 selection:bg-tertiary/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-surface dark:bg-surface-dim border-b border-outline-variant/30 dark:border-outline-variant/20 shadow-sm flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 z-50">
+<button aria-label="Edit Note" class="text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+</button>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="history_edu">history_edu</span>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary dark:text-primary-fixed italic tracking-tight">Ledger Diary</h1>
+</div>
+<button aria-hidden="true" class="text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150 p-2 rounded-full flex items-center justify-center opacity-0 pointer-events-none">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto w-full">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Ledger Entries List -->
+<div class="md:col-start-3 md:col-span-8 flex flex-col gap-6">
+<!-- Card 1 (Pinned) -->
+<article class="bg-parchment text-ink rounded-lg shadow-parchment relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1 duration-300">
+<div class="ribbon z-10"></div>
+<div class="p-6 md:p-8 ledger-margin h-full relative">
+<div class="flex justify-between items-start mb-3 relative z-20">
+<h2 class="font-title-md text-title-md font-semibold text-ink leading-tight">Midnight Reflections</h2>
+<span class="material-symbols-outlined text-gold" data-icon="push_pin" style="font-variation-settings: 'FILL' 1;">push_pin</span>
+</div>
+<p class="font-body-md text-body-md text-ink/80 mb-6 leading-relaxed line-clamp-3 md:line-clamp-none">
+                            The stars were particularly bright tonight over the harbor. A cool breeze swept through the study window, rustling the loose pages of the quarterly reports. It's in these quiet hours that clarity often strikes.
+                        </p>
+<div class="flex items-center gap-4 border-t border-ink/10 pt-4 mt-auto">
+<span class="inline-flex items-center gap-1 bg-amber text-on-tertiary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wider shadow-sm">
+<span>Reflection</span>
+<span>🌙</span>
+</span>
+<span class="text-ink/50 font-label-sm text-label-sm uppercase tracking-wider">Oct 24, 1892</span>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-parchment text-ink rounded-lg shadow-parchment relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1 duration-300">
+<div class="p-6 md:p-8 ledger-margin h-full relative">
+<div class="flex justify-between items-start mb-3 relative z-20">
+<h2 class="font-title-md text-title-md font-semibold text-ink leading-tight">The Harbor Project</h2>
+</div>
+<p class="font-body-md text-body-md text-ink/80 mb-6 leading-relaxed line-clamp-3 md:line-clamp-none">
+                            Finally secured the final signatures for the expansion. The negotiations were protracted, testing patience, but the foundation is now set. Tomorrow, we survey the eastern docks.
+                        </p>
+<div class="flex items-center gap-4 border-t border-ink/10 pt-4 mt-auto">
+<span class="inline-flex items-center gap-1 bg-amber text-on-tertiary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wider shadow-sm">
+<span>Milestone</span>
+<span>⭐</span>
+</span>
+<span class="text-ink/50 font-label-sm text-label-sm uppercase tracking-wider">Oct 22, 1892</span>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-parchment text-ink rounded-lg shadow-parchment relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1 duration-300">
+<div class="p-6 md:p-8 ledger-margin h-full relative">
+<div class="flex justify-between items-start mb-3 relative z-20">
+<h2 class="font-title-md text-title-md font-semibold text-ink leading-tight">Fleeting Whispers</h2>
+</div>
+<p class="font-body-md text-body-md text-ink/80 mb-6 leading-relaxed line-clamp-3 md:line-clamp-none">
+                            A quiet moment in the library today led to a revelation regarding the archival sorting mechanism. The dust motes dancing in the shaft of sunlight seemed to trace out the missing sequence.
+                        </p>
+<div class="flex items-center gap-4 border-t border-ink/10 pt-4 mt-auto">
+<span class="inline-flex items-center gap-1 bg-amber text-on-tertiary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wider shadow-sm">
+<span>Deep Thought</span>
+<span>💭</span>
+</span>
+<span class="text-ink/50 font-label-sm text-label-sm uppercase tracking-wider">Oct 18, 1892</span>
+</div>
+</div>
+</article>
+<div class="flex justify-center mt-8 mb-12">
+<button class="bg-surface-container-high text-on-surface px-6 py-2 rounded-full font-label-sm text-label-sm uppercase tracking-wider hover:bg-surface-bright transition-colors border border-outline-variant/30 flex items-center gap-2">
+                        Load Previous Entries
+                        <span class="material-symbols-outlined text-[16px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (FAB) -->
+<button aria-label="New Entry" class="fixed bottom-24 md:bottom-8 right-6 md:right-8 w-14 h-14 bg-amber text-on-tertiary-fixed rounded-full shadow-fab flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-200 z-50 group">
+<span class="material-symbols-outlined text-[28px] text-[#041424] transition-transform group-hover:rotate-90 duration-300" data-icon="add">add</span>
+</button>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full rounded-t-xl bg-surface dark:bg-surface-container-lowest border-t border-outline-variant/20 shadow-[0_-4px_12px_rgba(0,8,16,0.1)] z-40 flex justify-around items-center h-20 pb-safe px-6">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-3 hover:bg-surface-variant/50 rounded-lg active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="menu_book">menu_book</span>
+<span class="font-label-sm text-[10px] uppercase tracking-wider">Journal</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-3 hover:bg-surface-variant/50 rounded-lg active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="search">search</span>
+<span class="font-label-sm text-[10px] uppercase tracking-wider">Search</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-tertiary-container dark:bg-tertiary text-on-tertiary-container dark:text-on-tertiary rounded-full p-3 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="sr-only">Archive</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-3 hover:bg-surface-variant/50 rounded-lg active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="font-label-sm text-[10px] uppercase tracking-wider">Settings</span>
+</button>
+</nav>
+</body></html>

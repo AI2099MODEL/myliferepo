@@ -1,0 +1,6 @@
+{
+  "name": "Ledger",
+  "description": "A warm personal journal and binder organizer with Chat, Diary, Events, Vault, and Tasks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
