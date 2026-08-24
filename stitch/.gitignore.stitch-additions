@@ -1,6 +1,0 @@
-# --- Stitch integration ---
-.env
-node_modules/
-# Generated designs are build output, not source — safe to regenerate.
-# Comment this out if you'd rather commit the generated screens.
-stitch-designs/

@@ -78,9 +78,6 @@ interface EventDao {
     @Delete
     suspend fun deleteEvent(event: EventEntity)
 
-    @Query("SELECT * FROM events WHERE notifyMe = 1 AND eventTimestamp > :now ORDER BY eventTimestamp ASC")
-    suspend fun getPendingFutureEvents(now: Long): List<EventEntity>
-
     @Query("SELECT COUNT(*) FROM events")
     suspend fun getEventCount(): Int
 }
@@ -110,9 +107,6 @@ interface VaultDao {
 interface TaskDao {
     @Query("SELECT * FROM tasks ORDER BY isCompleted ASC, CASE WHEN scheduledTimestamp IS NULL THEN 1 ELSE 0 END, scheduledTimestamp ASC, id DESC")
     fun getAllTasks(): Flow<List<TaskEntity>>
-
-    @Query("SELECT * FROM tasks WHERE notifyMe = 1 AND isCompleted = 0 AND scheduledTimestamp IS NOT NULL AND scheduledTimestamp > :now ORDER BY scheduledTimestamp ASC")
-    suspend fun getPendingFutureTasks(now: Long): List<TaskEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: TaskEntity): Long

@@ -14,11 +14,11 @@ android {
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    applicationId = "com.mylyfe.app"
-    minSdk = 26
-    targetSdk = 35
+    applicationId = "com.aistudio.ledger.bkzq"
+    minSdk = 24
+    targetSdk = 36
     versionCode = 1
-    versionName = "1.0.0"
+    versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -42,15 +42,15 @@ android {
   buildTypes {
     release {
       isCrunchPngs = false
-      isMinifyEnabled = true
+      isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }
     debug { signingConfig = signingConfigs.getByName("debugConfig") }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
   }
   buildFeatures {
     compose = true

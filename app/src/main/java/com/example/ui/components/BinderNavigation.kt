@@ -52,7 +52,7 @@ fun LedgerBinderBottomBar(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            LedgerSection.entries.forEach { section ->
+            LedgerSection.values().forEach { section ->
                 val isSelected = currentSection == section
                 BinderTabItem(
                     section = section,
@@ -200,7 +200,7 @@ fun LedgerBinderNavRail(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            LedgerSection.entries.forEach { section ->
+            LedgerSection.values().forEach { section ->
                 val isSelected = currentSection == section
                 Surface(
                     modifier = Modifier

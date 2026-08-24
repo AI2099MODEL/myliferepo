@@ -100,25 +100,22 @@ class LedgerRepository(
         eventTimestamp: Long,
         notifyMe: Boolean,
         category: String = "General"
-    ): Long = withContext(Dispatchers.IO) {
-        val tempEvent = EventEntity(
+    ) = withContext(Dispatchers.IO) {
+        val notificationId = (System.currentTimeMillis() % 100000).toInt()
+        val event = EventEntity(
             title = title.trim(),
             locationOrNote = locationOrNote.trim(),
             eventTimestamp = eventTimestamp,
             notifyMe = notifyMe,
-            notificationScheduledId = 0,
+            notificationScheduledId = notificationId,
             category = category
         )
-        val id = eventDao.insertEvent(tempEvent)
-        val notifId = id.toInt()
-
-        val finalizedEvent = tempEvent.copy(id = id, notificationScheduledId = notifId)
-        eventDao.updateEvent(finalizedEvent)
+        val id = eventDao.insertEvent(event)
 
         if (notifyMe) {
             NotificationHelper.scheduleReminder(
                 context = context,
-                notificationId = notifId,
+                notificationId = notificationId,
                 title = title.trim(),
                 message = if (locationOrNote.isNotBlank()) "Location: $locationOrNote" else "Upcoming scheduled event in Ledger",
                 timestampMillis = eventTimestamp,
@@ -129,16 +126,15 @@ class LedgerRepository(
     }
 
     suspend fun deleteEvent(event: EventEntity) = withContext(Dispatchers.IO) {
-        val notifId = if (event.notificationScheduledId != 0) event.notificationScheduledId else event.id.toInt()
-        if (event.notifyMe && notifId != 0) {
-            NotificationHelper.cancelReminder(context, notifId)
+        if (event.notifyMe && event.notificationScheduledId != 0) {
+            NotificationHelper.cancelReminder(context, event.notificationScheduledId)
         }
         eventDao.deleteEvent(event)
     }
 
     suspend fun toggleEventNotification(event: EventEntity) = withContext(Dispatchers.IO) {
         val newNotify = !event.notifyMe
-        val notifId = if (event.notificationScheduledId != 0) event.notificationScheduledId else event.id.toInt()
+        val notifId = if (event.notificationScheduledId != 0) event.notificationScheduledId else (System.currentTimeMillis() % 100000).toInt()
         val updated = event.copy(notifyMe = newNotify, notificationScheduledId = notifId)
         eventDao.updateEvent(updated)
 
@@ -198,21 +194,18 @@ class LedgerRepository(
         scheduledTimestamp: Long?,
         priority: String,
         notifyMe: Boolean
-    ): Long = withContext(Dispatchers.IO) {
-        val tempTask = TaskEntity(
+    ) = withContext(Dispatchers.IO) {
+        val notifId = (System.currentTimeMillis() % 100000).toInt()
+        val task = TaskEntity(
             title = title.trim(),
             description = description.trim(),
             scheduledTimestamp = scheduledTimestamp,
             priority = priority,
             isCompleted = false,
             notifyMe = notifyMe,
-            notificationScheduledId = 0
+            notificationScheduledId = notifId
         )
-        val id = taskDao.insertTask(tempTask)
-        val notifId = id.toInt()
-
-        val finalizedTask = tempTask.copy(id = id, notificationScheduledId = notifId)
-        taskDao.updateTask(finalizedTask)
+        val id = taskDao.insertTask(task)
 
         if (notifyMe && scheduledTimestamp != null) {
             NotificationHelper.scheduleReminder(
@@ -229,68 +222,23 @@ class LedgerRepository(
 
     suspend fun toggleTaskComplete(task: TaskEntity) = withContext(Dispatchers.IO) {
         val newStatus = !task.isCompleted
-        val notifId = if (task.notificationScheduledId != 0) task.notificationScheduledId else task.id.toInt()
         val updated = task.copy(
             isCompleted = newStatus,
-            completedTimestamp = if (newStatus) System.currentTimeMillis() else null,
-            notificationScheduledId = notifId
+            completedTimestamp = if (newStatus) System.currentTimeMillis() else null
         )
         taskDao.updateTask(updated)
 
         // Cancel notification if completed
-        if (newStatus && task.notifyMe && notifId != 0) {
-            NotificationHelper.cancelReminder(context, notifId)
-        } else if (!newStatus && task.notifyMe && task.scheduledTimestamp != null && task.scheduledTimestamp > System.currentTimeMillis()) {
-            NotificationHelper.scheduleReminder(
-                context = context,
-                notificationId = notifId,
-                title = task.title,
-                message = if (task.description.isNotBlank()) task.description else "Priority: ${task.priority} task due in Ledger",
-                timestampMillis = task.scheduledTimestamp,
-                type = "TASK"
-            )
+        if (newStatus && task.notifyMe && task.notificationScheduledId != 0) {
+            NotificationHelper.cancelReminder(context, task.notificationScheduledId)
         }
     }
 
     suspend fun deleteTask(task: TaskEntity) = withContext(Dispatchers.IO) {
-        val notifId = if (task.notificationScheduledId != 0) task.notificationScheduledId else task.id.toInt()
-        if (task.notifyMe && notifId != 0) {
-            NotificationHelper.cancelReminder(context, notifId)
+        if (task.notifyMe && task.notificationScheduledId != 0) {
+            NotificationHelper.cancelReminder(context, task.notificationScheduledId)
         }
         taskDao.deleteTask(task)
-    }
-
-    // ----------------------------------------------------
-    // BOOT RESCHEDULER
-    // ----------------------------------------------------
-    suspend fun reschedulePendingAlarmsAfterBoot() = withContext(Dispatchers.IO) {
-        val now = System.currentTimeMillis()
-        val futureEvents = eventDao.getPendingFutureEvents(now)
-        for (event in futureEvents) {
-            val notifId = if (event.notificationScheduledId != 0) event.notificationScheduledId else event.id.toInt()
-            NotificationHelper.scheduleReminder(
-                context = context,
-                notificationId = notifId,
-                title = event.title,
-                message = if (event.locationOrNote.isNotBlank()) "Location: ${event.locationOrNote}" else "Scheduled event in Ledger",
-                timestampMillis = event.eventTimestamp,
-                type = "EVENT"
-            )
-        }
-
-        val futureTasks = taskDao.getPendingFutureTasks(now)
-        for (task in futureTasks) {
-            val scheduled = task.scheduledTimestamp ?: continue
-            val notifId = if (task.notificationScheduledId != 0) task.notificationScheduledId else task.id.toInt()
-            NotificationHelper.scheduleReminder(
-                context = context,
-                notificationId = notifId,
-                title = task.title,
-                message = if (task.description.isNotBlank()) task.description else "Priority: ${task.priority} task due in Ledger",
-                timestampMillis = scheduled,
-                type = "TASK"
-            )
-        }
     }
 
     // ----------------------------------------------------
