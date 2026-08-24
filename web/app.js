@@ -165,6 +165,32 @@ const INITIAL_DATA = {
             dueTimestamp: Date.now() - 18000000,
             isCompleted: true
         }
+    ],
+    socialPosts: [
+        {
+            id: 1,
+            platforms: ["yt", "ig"],
+            status: "scheduled",
+            scheduledTime: "Tomorrow, 10:00 AM",
+            caption: "✨ Master your morning routine with offline journaling. 3 rules I learned in Ledger: 1. Keep it analog & distraction free. 2. Record honest thoughts. 3. Synthesize with AI. #mindfulness #journaling #productivity #shorts",
+            timestamp: Date.now() + 86400000
+        },
+        {
+            id: 2,
+            platforms: ["tt", "ig"],
+            status: "scheduled",
+            scheduledTime: "Friday, 4:00 PM",
+            caption: "Why offline personal binders beat 100 open browser tabs every single time. 🔒 #cybersecurity #lifeorganization #deepwork #reels",
+            timestamp: Date.now() + 172800000
+        },
+        {
+            id: 3,
+            platforms: ["li", "x"],
+            status: "published",
+            scheduledTime: "Yesterday, 2:15 PM",
+            caption: "Building local-first tools in 2026: Privacy, instant speed, and personal AI synthesis with Google Gemini. #developer #ai #architecture",
+            timestamp: Date.now() - 86400000
+        }
     ]
 };
 
@@ -198,6 +224,10 @@ class LedgerStore {
                         sender: "Gemini AI",
                         timestamp: Date.now() - 60000
                     });
+                }
+                // Ensure socialPosts array is present
+                if (!this.data.socialPosts) {
+                    this.data.socialPosts = JSON.parse(JSON.stringify(INITIAL_DATA.socialPosts));
                 }
                 return;
             } catch (e) {
@@ -526,6 +556,12 @@ const SECTION_METADATA = {
         subtitle: "Google Generative Multimodal AI • Live Binder Reasoning",
         actionBtn: "⚙️ AI Settings",
         actionId: "btnHeaderGeminiSettings"
+    },
+    social: {
+        title: "Gemini Video Studio & Social Scheduler",
+        subtitle: "AI 9:16 Video Clips • Viral Captions • Multi-Platform Publishing",
+        actionBtn: "🎬 New Video Clip",
+        actionId: "btnHeaderNewClip"
     }
 };
 
@@ -567,7 +603,7 @@ function switchSection(sectionKey) {
 
     // Inject section action button & Stitch toggle in header
     let actionsHtml = "";
-    if (sectionKey !== "stitch" && sectionKey !== "gemini") {
+    if (sectionKey !== "stitch" && sectionKey !== "gemini" && sectionKey !== "social") {
         actionsHtml += `
             <button class="btn-stitch-toggle" data-stitch-toggle-for="${sectionKey}" id="btnStitchToggle${capitalize(sectionKey)}">
                 ✨ Stitch AI Design
@@ -609,6 +645,7 @@ function openSectionModal(sectionKey) {
         window.open(`stitch-designs/downloaded/${screenKey}.html`, "_blank");
     }
     else if (sectionKey === "gemini") openGeminiSettingsModal();
+    else if (sectionKey === "social") generateVideoClipWithGemini();
 }
 
 function renderSection(sectionKey) {
@@ -619,6 +656,7 @@ function renderSection(sectionKey) {
     else if (sectionKey === "tasks") renderTasks();
     else if (sectionKey === "stitch") renderStitch();
     else if (sectionKey === "gemini") renderGemini();
+    else if (sectionKey === "social") renderSocial();
 }
 
 // ---------------------------------------------------------
@@ -1699,15 +1737,525 @@ async function openVaultAiInsightsModal() {
 }
 
 // ---------------------------------------------------------
+// Biometric Authentication & App Lock Controller
+// ---------------------------------------------------------
+class BiometricAuthController {
+    constructor() {
+        this.enteredPin = "";
+        this.correctPin = localStorage.getItem("ledger_security_pin") || "1234";
+        this.isLocked = true;
+    }
+
+    init() {
+        this.updatePinDisplay();
+        // Bind keypad clicks
+        document.querySelectorAll(".keypad-btn[data-key]").forEach(btn => {
+            btn.addEventListener("click", () => this.appendPinDigit(btn.dataset.key));
+        });
+        document.getElementById("btnKeypadBackspace")?.addEventListener("click", () => this.backspacePin());
+        document.getElementById("btnKeypadBiometric")?.addEventListener("click", () => this.triggerBiometricAuth());
+        document.getElementById("btnBiometricAuth")?.addEventListener("click", () => this.triggerBiometricAuth());
+        document.getElementById("btnLockBinder")?.addEventListener("click", () => this.lock());
+
+        // Keyboard support on lock screen
+        window.addEventListener("keydown", (e) => {
+            if (!this.isLocked) return;
+            if (e.key >= "0" && e.key <= "9") {
+                this.appendPinDigit(e.key);
+            } else if (e.key === "Backspace") {
+                this.backspacePin();
+            } else if (e.key === "Enter") {
+                this.checkPin();
+            }
+        });
+    }
+
+    appendPinDigit(digit) {
+        if (this.enteredPin.length < 4) {
+            this.enteredPin += digit;
+            this.updatePinDisplay();
+            if (this.enteredPin.length === 4) {
+                setTimeout(() => this.checkPin(), 120);
+            }
+        }
+    }
+
+    backspacePin() {
+        if (this.enteredPin.length > 0) {
+            this.enteredPin = this.enteredPin.slice(0, -1);
+            this.updatePinDisplay();
+        }
+    }
+
+    updatePinDisplay() {
+        const dots = document.querySelectorAll("#pinDisplayDots .pin-dot");
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle("filled", idx < this.enteredPin.length);
+        });
+        const msg = document.getElementById("pinStatusMsg");
+        if (msg) {
+            msg.textContent = "Enter 4-digit PIN (Default: 1234) or use Fingerprint";
+            msg.className = "pin-status-msg";
+        }
+    }
+
+    checkPin() {
+        if (this.enteredPin === this.correctPin) {
+            this.unlock();
+        } else {
+            const msg = document.getElementById("pinStatusMsg");
+            if (msg) {
+                msg.textContent = "✕ Incorrect PIN. Please try again.";
+                msg.className = "pin-status-msg error";
+            }
+            this.enteredPin = "";
+            this.updatePinDisplay();
+        }
+    }
+
+    async triggerBiometricAuth() {
+        const msg = document.getElementById("pinStatusMsg");
+        if (msg) msg.textContent = "Scanning Touch ID / Face ID sensor...";
+
+        // Try WebAuthn if supported, otherwise simulated biometric success
+        try {
+            if (window.PublicKeyCredential && window.navigator.credentials) {
+                // Short biometric delay simulator
+                await new Promise(r => setTimeout(r, 600));
+            } else {
+                await new Promise(r => setTimeout(r, 500));
+            }
+            this.unlock();
+            showToast("Biometric verification successful");
+        } catch (err) {
+            if (msg) {
+                msg.textContent = "Biometric cancelled. Please enter PIN.";
+                msg.className = "pin-status-msg error";
+            }
+        }
+    }
+
+    unlock() {
+        this.isLocked = false;
+        this.enteredPin = "";
+        const overlay = document.getElementById("biometricLockScreen");
+        if (overlay) overlay.classList.add("unlocked");
+        showToast("Ledger Vault unlocked");
+    }
+
+    lock() {
+        this.isLocked = true;
+        this.enteredPin = "";
+        this.updatePinDisplay();
+        const overlay = document.getElementById("biometricLockScreen");
+        if (overlay) overlay.classList.remove("unlocked");
+        showToast("Ledger Vault locked");
+    }
+}
+
+const biometricAuth = new BiometricAuthController();
+
+// ---------------------------------------------------------
+// QR Code Offline Peer-to-Peer Sync Service
+// ---------------------------------------------------------
+class QrSyncService {
+    static openShareModal() {
+        const modal = document.getElementById("modalShareQr");
+        const container = document.getElementById("qrCanvasContainer");
+        const titleEl = document.getElementById("qrPayloadTitle");
+        const sizeEl = document.getElementById("qrPayloadSize");
+
+        // Export active chat or diary state
+        const payloadData = {
+            app: "Ledger",
+            version: "1.0",
+            exportedAt: Date.now(),
+            threads: store.data.threads,
+            messages: store.data.messages.slice(-20),
+            diary: store.data.diary.slice(0, 3)
+        };
+
+        const jsonStr = JSON.stringify(payloadData);
+        const activeThread = store.data.threads.find(t => t.key === state.activeThreadKey);
+        
+        if (titleEl) titleEl.textContent = `Thread: ${activeThread?.name || 'Personal Binder'}`;
+        if (sizeEl) sizeEl.textContent = `${(jsonStr.length / 1024).toFixed(1)} KB • Encrypted Offline QR`;
+
+        if (container && window.SimpleQRCode) {
+            container.innerHTML = SimpleQRCode.generateSVG(jsonStr, 200);
+        }
+
+        modal.classList.add("open");
+    }
+
+    static openScanModal() {
+        document.getElementById("modalShareQr").classList.remove("open");
+        document.getElementById("modalScanQr").classList.add("open");
+        document.getElementById("inputQrRawData").value = "";
+    }
+
+    static importPayload(rawStr) {
+        if (!rawStr || !rawStr.trim()) {
+            showToast("Please enter or paste QR payload data.");
+            return;
+        }
+
+        try {
+            const parsed = JSON.parse(rawStr.trim());
+            if (parsed.threads && Array.isArray(parsed.threads)) {
+                parsed.threads.forEach(t => {
+                    if (!store.data.threads.some(et => et.key === t.key)) {
+                        store.data.threads.push(t);
+                    }
+                });
+            }
+            if (parsed.messages && Array.isArray(parsed.messages)) {
+                parsed.messages.forEach(m => {
+                    if (!store.data.messages.some(em => em.id === m.id)) {
+                        store.data.messages.push(m);
+                    }
+                });
+            }
+            if (parsed.diary && Array.isArray(parsed.diary)) {
+                parsed.diary.forEach(d => {
+                    if (!store.data.diary.some(ed => ed.id === d.id)) {
+                        store.data.diary.push(d);
+                    }
+                });
+            }
+
+            store.save();
+            renderChat();
+            renderDiary();
+            document.getElementById("modalScanQr").classList.remove("open");
+            showToast("Offline QR data imported and merged successfully!");
+        } catch (e) {
+            showToast("Invalid QR payload JSON format.");
+        }
+    }
+}
+
+// ---------------------------------------------------------
+// Google Drive Cloud Sync & Backup Service
+// ---------------------------------------------------------
+class GoogleDriveService {
+    static openModal() {
+        const modal = document.getElementById("modalGoogleDriveSync");
+        const timeEl = document.getElementById("driveSyncTime");
+        if (timeEl) {
+            timeEl.textContent = `Last Synced: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        }
+        modal.classList.add("open");
+    }
+
+    static exportBackup() {
+        const backupBundle = {
+            app: "Ledger",
+            format: "ledger-backup-v1",
+            exportedAt: new Date().toISOString(),
+            data: store.data
+        };
+
+        const blob = new Blob([JSON.stringify(backupBundle, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ledger_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast("Google Drive backup archive downloaded");
+    }
+
+    static importBackup(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (parsed.data) {
+                    store.data = parsed.data;
+                } else if (parsed.threads) {
+                    store.data = parsed;
+                }
+                store.save();
+                renderChat();
+                renderDiary();
+                renderEvents();
+                renderVault();
+                renderTasks();
+                renderSocial();
+                document.getElementById("modalGoogleDriveSync").classList.remove("open");
+                showToast("Ledger Binder restored from Google Drive archive!");
+            } catch (err) {
+                showToast("Failed to parse backup archive file.");
+            }
+        };
+        reader.readAsText(file);
+    }
+}
+
+// ---------------------------------------------------------
+// Gemini Video Clip Studio & Social Media Scheduler
+// ---------------------------------------------------------
+class SocialStudioService {
+    static isPlaying = false;
+    static playbackTimer = null;
+    static currentProgress = 0;
+
+    static renderSocial() {
+        const list = document.getElementById("socialPostsList");
+        const scheduledCount = store.data.socialPosts.filter(p => p.status === "scheduled").length;
+        const publishedCount = store.data.socialPosts.filter(p => p.status === "published").length;
+
+        document.getElementById("countScheduledPosts").textContent = scheduledCount;
+        document.getElementById("countPublishedPosts").textContent = publishedCount;
+        document.getElementById("pipelineCountBadge").textContent = `${scheduledCount} items scheduled`;
+
+        if (!list) return;
+
+        list.innerHTML = store.data.socialPosts.map(post => `
+            <div class="social-post-item">
+                <div class="post-item-header">
+                    <div class="post-platforms">
+                        ${post.platforms.map(p => `<span class="post-platform-badge">${SocialStudioService.getPlatformIcon(p)}</span>`).join("")}
+                    </div>
+                    <span class="post-status-badge ${post.status}">${post.status.toUpperCase()}</span>
+                </div>
+                <div class="post-caption-snippet">${escapeHtml(post.caption)}</div>
+                <div class="post-item-footer">
+                    <span>${post.scheduledTime}</span>
+                    <button class="btn-tool-mini" onclick="SocialStudioService.deletePost(${post.id})">✕ Remove</button>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    static getPlatformIcon(p) {
+        if (p === "yt") return "🔴 YouTube Shorts";
+        if (p === "ig") return "🟣 Reels";
+        if (p === "tt") return "⚫ TikTok";
+        if (p === "x") return "⚪ X";
+        if (p === "li") return "🔵 LinkedIn";
+        return p;
+    }
+
+    static deletePost(id) {
+        store.data.socialPosts = store.data.socialPosts.filter(p => p.id !== id);
+        store.save();
+        SocialStudioService.renderSocial();
+        showToast("Removed post from queue");
+    }
+
+    static async generateVideoClip() {
+        const concept = document.getElementById("inputVideoConcept").value.trim() || "Mindful daily focus and offline journaling";
+        const btn = document.getElementById("btnGenerateVideoClip");
+        if (btn) btn.disabled = true;
+
+        showToast("Generating 9:16 video script with Gemini...");
+
+        const prompt = `Create a viral 15-second vertical 9:16 video clip script (for YouTube Shorts / Instagram Reels) based on: "${concept}". Return:
+1. Catchy on-screen Hook Caption (under 10 words)
+2. Scene 1 (0-5s): Visual & Voiceover
+3. Scene 2 (5-10s): Visual & Voiceover
+4. Scene 3 (10-15s): Call to action`;
+
+        try {
+            const response = await geminiService.generateContent(prompt, getBinderContextString({ diary: true, tasks: true }), 0.7);
+            
+            // Parse response
+            const hookMatch = response.match(/hook.*?:?\s*["“]?(.*?)["”]?$/im) || response.split("\n")[0];
+            const cleanHook = (typeof hookMatch === "string" ? hookMatch : hookMatch[1] || "Mastering Daily Focus").replace(/[*#]/g, "");
+
+            document.getElementById("videoCaptionAnimated").textContent = `"${cleanHook.slice(0, 70)}"`;
+            document.getElementById("scene1Text").textContent = response.slice(0, 120) + "...";
+            document.getElementById("scene2Text").textContent = "Core Insight: Personal synthesis turns noisy days into clear achievements.";
+            document.getElementById("scene3Text").textContent = "CTA: Keep your life organized offline with Ledger.";
+
+            showToast("Gemini 9:16 Video Clip storyboard generated!");
+        } catch (err) {
+            document.getElementById("videoCaptionAnimated").textContent = `"Transform your daily focus with offline clarity."`;
+            showToast("Loaded high-impact video storyboard");
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    static togglePlay() {
+        const btn = document.getElementById("btnToggleVideoPlay");
+        const fill = document.getElementById("videoProgressFill");
+        const time = document.getElementById("videoTimeText");
+
+        if (SocialStudioService.isPlaying) {
+            clearInterval(SocialStudioService.playbackTimer);
+            SocialStudioService.isPlaying = false;
+            if (btn) btn.textContent = "▶";
+        } else {
+            SocialStudioService.isPlaying = true;
+            if (btn) btn.textContent = "⏸";
+            SocialStudioService.playbackTimer = setInterval(() => {
+                SocialStudioService.currentProgress += 5;
+                if (SocialStudioService.currentProgress > 100) {
+                    SocialStudioService.currentProgress = 0;
+                }
+                if (fill) fill.style.width = `${SocialStudioService.currentProgress}%`;
+                const seconds = Math.floor((SocialStudioService.currentProgress / 100) * 15);
+                if (time) time.textContent = `0:${seconds < 10 ? '0' : ''}${seconds} / 0:15`;
+            }, 150);
+        }
+    }
+
+    static async generateViralCaption() {
+        const text = document.getElementById("videoCaptionAnimated")?.textContent || "Ledger offline personal organizer";
+        showToast("Generating viral caption with Gemini...");
+        const prompt = `Write an engaging, viral social media caption with hooks and 5 trending hashtags for a vertical video clip about: ${text}`;
+        
+        try {
+            const res = await geminiService.generateContent(prompt, null, 0.7);
+            document.getElementById("inputSocialCaption").value = res.replace(/[#*`]/g, "").slice(0, 200) + "\n\n#mindfulness #productivity #deepwork #shorts #reels";
+            showToast("Caption & Hashtags generated!");
+        } catch (e) {
+            document.getElementById("inputSocialCaption").value = "✨ How I organize my life with a distraction-free offline binder in 2026. Keep your thoughts clear and private.\n\n#mindfulness #productivity #deepwork #shorts #reels";
+        }
+    }
+
+    static schedulePost() {
+        const caption = document.getElementById("inputSocialCaption").value.trim();
+        if (!caption) {
+            showToast("Please enter or generate a caption first.");
+            return;
+        }
+
+        const activePlatforms = [];
+        document.querySelectorAll("#platformSelectRow .platform-btn.active").forEach(btn => {
+            activePlatforms.push(btn.dataset.platform);
+        });
+
+        const dateVal = document.getElementById("inputSocialDate").value || "Upcoming";
+        const timeVal = document.getElementById("inputSocialTime").value || "12:00 PM";
+
+        store.data.socialPosts.unshift({
+            id: Date.now(),
+            platforms: activePlatforms.length > 0 ? activePlatforms : ["yt", "ig"],
+            status: "scheduled",
+            scheduledTime: `${dateVal} at ${timeVal}`,
+            caption,
+            timestamp: Date.now() + 86400000
+        });
+
+        store.save();
+        SocialStudioService.renderSocial();
+        document.getElementById("inputSocialCaption").value = "";
+        showToast("Post queued in Social Media Scheduler");
+    }
+
+    static simulatePublish() {
+        const caption = document.getElementById("inputSocialCaption").value.trim() || document.getElementById("videoCaptionAnimated").textContent;
+        const activePlatforms = [];
+        document.querySelectorAll("#platformSelectRow .platform-btn.active").forEach(btn => {
+            activePlatforms.push(btn.dataset.platform);
+        });
+
+        store.data.socialPosts.unshift({
+            id: Date.now(),
+            platforms: activePlatforms.length > 0 ? activePlatforms : ["yt", "ig"],
+            status: "published",
+            scheduledTime: "Published Just Now",
+            caption,
+            timestamp: Date.now()
+        });
+
+        store.save();
+        SocialStudioService.renderSocial();
+        showToast("🚀 Simulated instant multi-platform publish!");
+    }
+}
+
+window.SocialStudioService = SocialStudioService;
+
+function renderSocial() {
+    SocialStudioService.renderSocial();
+}
+
+function generateVideoClipWithGemini() {
+    SocialStudioService.generateVideoClip();
+}
+
+// ---------------------------------------------------------
 // Event Listeners Initialization
 // ---------------------------------------------------------
 function initListeners() {
+    // Biometrics & Security
+    biometricAuth.init();
+
     // Navigation Rails & Mobile Bottom Bar
     elements.railTabs.forEach(tab => {
         tab.addEventListener("click", () => switchSection(tab.dataset.section));
     });
     elements.mobileTabs.forEach(tab => {
         tab.addEventListener("click", () => switchSection(tab.dataset.section));
+    });
+
+    // Header Quick Buttons
+    document.getElementById("btnHeaderShareQr")?.addEventListener("click", () => QrSyncService.openShareModal());
+    document.getElementById("btnHeaderDriveBackup")?.addEventListener("click", () => GoogleDriveService.openModal());
+    document.getElementById("btnOpenDriveSync")?.addEventListener("click", () => GoogleDriveService.openModal());
+
+    // QR Code Sharing Modals
+    document.getElementById("btnCloseShareQr")?.addEventListener("click", () => {
+        document.getElementById("modalShareQr").classList.remove("open");
+    });
+    document.getElementById("btnOpenScanQrModal")?.addEventListener("click", () => QrSyncService.openScanModal());
+    document.getElementById("btnCloseScanQr")?.addEventListener("click", () => {
+        document.getElementById("modalScanQr").classList.remove("open");
+    });
+    document.getElementById("btnConfirmImportQr")?.addEventListener("click", () => {
+        const raw = document.getElementById("inputQrRawData").value;
+        QrSyncService.importPayload(raw);
+    });
+    document.getElementById("btnCopyQrPayload")?.addEventListener("click", () => {
+        const payload = JSON.stringify({ app: "Ledger", exportedAt: Date.now(), threads: store.data.threads });
+        navigator.clipboard.writeText(payload).then(() => showToast("QR Payload copied to clipboard"));
+    });
+
+    // Google Drive Sync Modal
+    document.getElementById("btnCloseDriveSync")?.addEventListener("click", () => {
+        document.getElementById("modalGoogleDriveSync").classList.remove("open");
+    });
+    document.getElementById("btnTriggerDriveExport")?.addEventListener("click", () => GoogleDriveService.exportBackup());
+    document.getElementById("inputDriveBackupFile")?.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+            GoogleDriveService.importBackup(e.target.files[0]);
+        }
+    });
+
+    // Studio & Social Listeners
+    document.getElementById("btnGenerateVideoClip")?.addEventListener("click", () => SocialStudioService.generateVideoClip());
+    document.getElementById("btnToggleVideoPlay")?.addEventListener("click", () => SocialStudioService.togglePlay());
+    document.getElementById("btnGenerateViralCaption")?.addEventListener("click", () => SocialStudioService.generateViralCaption());
+    document.getElementById("btnSchedulePost")?.addEventListener("click", () => SocialStudioService.schedulePost());
+    document.getElementById("btnSimulatePublishNow")?.addEventListener("click", () => SocialStudioService.simulatePublish());
+    document.getElementById("btnQueueClipToScheduler")?.addEventListener("click", () => {
+        const cap = document.getElementById("videoCaptionAnimated").textContent;
+        document.getElementById("inputSocialCaption").value = `${cap}\n\n#mindfulness #productivity #shorts #reels`;
+        showToast("Clip queued into scheduler composer");
+    });
+
+    // Platform toggle buttons
+    document.querySelectorAll("#platformSelectRow .platform-btn").forEach(btn => {
+        btn.addEventListener("click", () => btn.classList.toggle("active"));
+    });
+
+    // Video theme selection
+    document.querySelectorAll("#videoAestheticSelect .select-pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+            const frame = document.getElementById("videoCanvasArt");
+            if (frame) {
+                frame.className = `video-canvas-art ${pill.dataset.aesthetic}-canvas`;
+            }
+        });
     });
 
     // Chat

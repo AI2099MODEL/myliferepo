@@ -5,12 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ledger — Personal Offline Binder & Organizer</title>
     <meta name="description" content="Personal offline notebook, organizer, and binder for threads, journal diary, calendar events, vault documents, and task checklists.">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d1b2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230d1b2e'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%23b8935a' stroke-width='16'/%3E%3Ctext x='256' y='330' font-family='serif' font-size='240' font-weight='bold' fill='%23b8935a' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Biometric Authentication App Lock Screen -->
+    <div class="biometric-lock-overlay" id="biometricLockScreen">
+        <div class="biometric-card">
+            <div class="biometric-crest">
+                <div class="crest-monogram">L</div>
+                <div class="crest-sparkle">✦</div>
+            </div>
+            <h2 class="biometric-title">LEDGER SECURITY VAULT</h2>
+            <p class="biometric-subtitle">Personal Offline Binder Protected with Biometrics & PIN</p>
+            
+            <div class="pin-display-dots" id="pinDisplayDots">
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+                <span class="pin-dot"></span>
+            </div>
+            <div class="pin-status-msg" id="pinStatusMsg">Enter 4-digit PIN (Default: 1234) or use Fingerprint</div>
+
+            <div class="vintage-keypad">
+                <button class="keypad-btn" data-key="1">1</button>
+                <button class="keypad-btn" data-key="2">2</button>
+                <button class="keypad-btn" data-key="3">3</button>
+                <button class="keypad-btn" data-key="4">4</button>
+                <button class="keypad-btn" data-key="5">5</button>
+                <button class="keypad-btn" data-key="6">6</button>
+                <button class="keypad-btn" data-key="7">7</button>
+                <button class="keypad-btn" data-key="8">8</button>
+                <button class="keypad-btn" data-key="9">9</button>
+                <button class="keypad-btn keypad-action" id="btnKeypadBiometric" title="Unlock with Biometrics">
+                    <span class="keypad-icon">🔒</span>
+                </button>
+                <button class="keypad-btn" data-key="0">0</button>
+                <button class="keypad-btn keypad-action" id="btnKeypadBackspace" title="Backspace">
+                    <span class="keypad-icon">⌫</span>
+                </button>
+            </div>
+
+            <button class="btn-biometric-touch" id="btnBiometricAuth">
+                <span class="fingerprint-pulse"></span>
+                <span class="btn-bio-icon">👆</span>
+                <span>Unlock with Touch ID / Face ID</span>
+            </button>
+        </div>
+    </div>
+
     <div class="ledger-app" id="ledgerApp">
         <!-- Desktop Binder Spine / Navigation Rail -->
         <aside class="binder-rail" id="binderRail">
@@ -58,6 +108,11 @@
                     <span class="tab-label">Gemini Studio</span>
                     <span class="tab-brass-indicator"></span>
                 </button>
+                <button class="rail-tab rail-tab-social" data-section="social" id="railTabSocial">
+                    <span class="tab-icon">🎬</span>
+                    <span class="tab-label">Studio & Social</span>
+                    <span class="tab-brass-indicator"></span>
+                </button>
             </nav>
 
             <div class="binder-footer-status">
@@ -65,11 +120,21 @@
                     <div class="status-indicator-dot"></div>
                     <span class="status-text">LOCAL STORAGE ACTIVE</span>
                 </div>
-                <button class="btn-gemini-key-gear" id="btnOpenGeminiSettings" title="Configure Google Gemini AI Studio API Key">
-                    <span class="gemini-sparkle">✦</span>
-                    <span>AI Settings</span>
-                    <span class="key-status-dot" id="keyStatusDot"></span>
-                </button>
+                <div class="footer-actions-grid">
+                    <button class="btn-footer-tool" id="btnOpenGeminiSettings" title="Configure Google Gemini AI Studio API Key">
+                        <span class="gemini-sparkle">✦</span>
+                        <span>AI Settings</span>
+                        <span class="key-status-dot" id="keyStatusDot"></span>
+                    </button>
+                    <button class="btn-footer-tool" id="btnOpenDriveSync" title="Sync & Backup with Google Drive">
+                        <span>☁️</span>
+                        <span>Drive Sync</span>
+                    </button>
+                    <button class="btn-footer-tool btn-footer-lock" id="btnLockBinder" title="Lock Binder with Biometrics/PIN">
+                        <span>🔒</span>
+                        <span>Lock Binder</span>
+                    </button>
+                </div>
             </div>
         </aside>
 
@@ -85,7 +150,12 @@
                     </div>
                 </div>
                 <div class="header-actions" id="headerActions">
-                    <!-- Dynamic action buttons injected per section -->
+                    <button class="btn-tool-outline" id="btnHeaderShareQr" title="Share via Offline QR Code">
+                        <span>📱 QR Code</span>
+                    </button>
+                    <button class="btn-tool-outline" id="btnHeaderDriveBackup" title="Backup to Google Drive">
+                        <span>☁️ Backup</span>
+                    </button>
                     <button class="btn-stitch-toggle" id="btnToggleStitchInline" title="Toggle Google Stitch AI Design for this section">
                         <span>✨ Stitch AI View</span>
                     </button>
@@ -458,6 +528,178 @@
                                     </div>
                                 </div>
                             </div>
+                <!-- SECTION 8: STUDIO & SOCIAL (GEMINI VIDEO CLIPS & SOCIAL MEDIA SCHEDULER) -->
+                <section class="ledger-section hidden" id="sectionSocial">
+                    <div class="social-studio-container">
+                        <!-- Top Social Hero -->
+                        <div class="social-hero-card">
+                            <div class="hero-left">
+                                <div class="social-badge">✦ GEMINI MULTIMODAL STUDIO</div>
+                                <h2 class="social-hero-title">Video Clip Generator & Social Media Scheduler</h2>
+                                <p class="social-hero-desc">Turn your journal reflections, notes, and milestones into viral 9:16 vertical video storyboards, cinematic captions, and scheduled multi-platform posts.</p>
+                            </div>
+                            <div class="hero-right-metrics">
+                                <div class="metric-pill">
+                                    <span class="metric-val" id="countScheduledPosts">3</span>
+                                    <span class="metric-lbl">Scheduled</span>
+                                </div>
+                                <div class="metric-pill">
+                                    <span class="metric-val" id="countPublishedPosts">8</span>
+                                    <span class="metric-lbl">Published</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2-Column Studio Grid -->
+                        <div class="studio-grid">
+                            <!-- Left Column: Gemini Video Clip Maker -->
+                            <div class="studio-card video-maker-card">
+                                <div class="card-head">
+                                    <div class="head-left">
+                                        <span class="card-icon">🎬</span>
+                                        <span class="card-title">Gemini Video Clip Studio</span>
+                                    </div>
+                                    <span class="aspect-badge">9:16 Vertical Video</span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Content Source</label>
+                                    <div class="modal-pills-select" id="videoSourceSelect">
+                                        <button class="select-pill active" data-source="diary">📖 Recent Diary</button>
+                                        <button class="select-pill" data-source="tasks">✓ Task Milestone</button>
+                                        <button class="select-pill" data-source="quote">📜 Quote / Insight</button>
+                                        <button class="select-pill" data-source="custom">💭 Custom Idea</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Video Theme & Aesthetic</label>
+                                    <div class="modal-pills-select" id="videoAestheticSelect">
+                                        <button class="select-pill active" data-aesthetic="vintage">Vintage Ink & Brass</button>
+                                        <button class="select-pill" data-aesthetic="cyber">Cyber Dark Luxe</button>
+                                        <button class="select-pill" data-aesthetic="indigo">Midnight Indigo</button>
+                                        <button class="select-pill" data-aesthetic="parchment">Ethereal Paper</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Topic / Prompt Concept</label>
+                                    <textarea id="inputVideoConcept" class="ledger-input ledger-textarea small" placeholder="e.g. 3 principles of disciplined morning journaling from my diary..."></textarea>
+                                </div>
+
+                                <div class="video-actions-row">
+                                    <button class="btn-primary btn-generate-clip" id="btnGenerateVideoClip">
+                                        <span class="gemini-sparkle">✦</span>
+                                        <span>Generate Video Script & Storyboard</span>
+                                    </button>
+                                </div>
+
+                                <!-- Interactive 9:16 Video Player Simulator -->
+                                <div class="video-preview-wrapper" id="videoPreviewWrapper">
+                                    <div class="phone-frame-916" id="phoneVideoFrame">
+                                        <div class="video-canvas-art vintage-canvas" id="videoCanvasArt">
+                                            <div class="video-overlay-particles"></div>
+                                            <div class="video-screen-content">
+                                                <div class="video-hook-badge" id="videoHookBadge">✦ DAILY INSIGHT</div>
+                                                <div class="video-caption-animated" id="videoCaptionAnimated">"Discipline is the bridge between goals and accomplishment."</div>
+                                                <div class="video-subtext" id="videoSubtext">Ledger Journal • 9:16 Vertical Reel</div>
+                                            </div>
+                                            <div class="video-audio-badge">🎵 Lo-Fi Focus Flow</div>
+                                        </div>
+
+                                        <div class="video-controls-bar">
+                                            <button class="btn-play-pause" id="btnToggleVideoPlay">▶</button>
+                                            <div class="video-progress-track">
+                                                <div class="video-progress-fill" id="videoProgressFill"></div>
+                                            </div>
+                                            <span class="video-time" id="videoTimeText">0:00 / 0:15</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="storyboard-breakdown" id="storyboardBreakdown">
+                                        <h4 class="storyboard-title">Storyboard Scenes</h4>
+                                        <div class="scene-item">
+                                            <span class="scene-num">Scene 1 (0-5s)</span>
+                                            <p class="scene-txt" id="scene1Text">Hook: Close-up ink dipping on vintage leather binder.</p>
+                                        </div>
+                                        <div class="scene-item">
+                                            <span class="scene-num">Scene 2 (5-10s)</span>
+                                            <p class="scene-txt" id="scene2Text">Core Point: Focus routines eliminate 90% of cognitive friction.</p>
+                                        </div>
+                                        <div class="scene-item">
+                                            <span class="scene-num">Scene 3 (10-15s)</span>
+                                            <p class="scene-txt" id="scene3Text">Outro: Organize your life offline in Ledger.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="btn-secondary btn-queue-clip" id="btnQueueClipToScheduler">
+                                    <span>➕ Queue This Clip into Social Scheduler</span>
+                                </button>
+                            </div>
+
+                            <!-- Right Column: Social Media Scheduler -->
+                            <div class="studio-card scheduler-card">
+                                <div class="card-head">
+                                    <div class="head-left">
+                                        <span class="card-icon">🗓️</span>
+                                        <span class="card-title">Social Media Scheduler</span>
+                                    </div>
+                                    <button class="btn-tool-mini" id="btnRefreshScheduler">↻ Refresh Queue</button>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Destination Platforms</label>
+                                    <div class="platform-toggles-row" id="platformSelectRow">
+                                        <button class="platform-btn active" data-platform="yt">🔴 YouTube Shorts</button>
+                                        <button class="platform-btn active" data-platform="ig">🟣 Instagram Reels</button>
+                                        <button class="platform-btn" data-platform="tt">⚫ TikTok</button>
+                                        <button class="platform-btn" data-platform="x">⚪ X (Twitter)</button>
+                                        <button class="platform-btn" data-platform="li">🔵 LinkedIn</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label>Schedule Date</label>
+                                        <input type="date" id="inputSocialDate" class="ledger-input">
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label>Schedule Time</label>
+                                        <input type="time" id="inputSocialTime" class="ledger-input">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="form-label-row">
+                                        <label>Post Caption & Hashtags</label>
+                                        <button class="btn-mini-ai" id="btnGenerateViralCaption">
+                                            <span class="gemini-sparkle">✦</span>
+                                            <span>AI Caption & Tags</span>
+                                        </button>
+                                    </div>
+                                    <textarea id="inputSocialCaption" class="ledger-input ledger-textarea" placeholder="Write your post caption, hook, and tags..."></textarea>
+                                </div>
+
+                                <div class="scheduler-actions-row">
+                                    <button class="btn-primary" id="btnSchedulePost">
+                                        <span>🗓️ Schedule Post</span>
+                                    </button>
+                                    <button class="btn-secondary" id="btnSimulatePublishNow">
+                                        <span>🚀 Publish Now</span>
+                                    </button>
+                                </div>
+
+                                <!-- Scheduled Posts Pipeline -->
+                                <div class="social-pipeline-header">
+                                    <h4>Scheduled Queue Pipeline</h4>
+                                    <span class="pipeline-count" id="pipelineCountBadge">3 items queued</span>
+                                </div>
+
+                                <div class="social-posts-list" id="socialPostsList">
+                                    <!-- Dynamic post items injected here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -499,6 +741,11 @@
                     <span class="mob-tab-indicator"></span>
                     <span class="mob-icon">✦</span>
                     <span class="mob-label">Gemini</span>
+                </button>
+                <button class="mobile-tab" data-section="social" id="mobTabSocial">
+                    <span class="mob-tab-indicator"></span>
+                    <span class="mob-icon">🎬</span>
+                    <span class="mob-label">Social</span>
                 </button>
             </nav>
         </main>
@@ -855,10 +1102,118 @@
         </div>
     </div>
 
+    <!-- QR Code Share Modal -->
+    <div class="modal-overlay" id="modalShareQr">
+        <div class="ledger-modal modal-qr">
+            <div class="modal-gemini-header">
+                <div class="gemini-sparkle-icon">📱</div>
+                <div>
+                    <h3 class="modal-title">Offline QR Code Sync & Share</h3>
+                    <p class="modal-subtitle">Share threads, notes, or tasks peer-to-peer without servers.</p>
+                </div>
+            </div>
+
+            <div class="qr-preview-box">
+                <div class="qr-canvas-container" id="qrCanvasContainer">
+                    <!-- SVG QR Code rendered here -->
+                </div>
+                <div class="qr-info-meta">
+                    <span class="qr-payload-title" id="qrPayloadTitle">Thread: Personal Binder</span>
+                    <span class="qr-payload-size" id="qrPayloadSize">1.2 KB • Encrypted Payload</span>
+                </div>
+            </div>
+
+            <div class="qr-actions-row">
+                <button class="btn-secondary" id="btnCopyQrPayload">
+                    <span>📋 Copy Payload</span>
+                </button>
+                <button class="btn-secondary" id="btnOpenScanQrModal">
+                    <span>📷 Scan / Import QR</span>
+                </button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseShareQr">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Import / Scanner Modal -->
+    <div class="modal-overlay" id="modalScanQr">
+        <div class="ledger-modal">
+            <h3 class="modal-title">Import Offline QR Data</h3>
+            <p class="modal-subtitle">Paste encoded QR payload or import a backup snippet into Ledger.</p>
+            
+            <div class="form-group">
+                <label>Paste QR Data / Encoded JSON</label>
+                <textarea id="inputQrRawData" class="ledger-input ledger-textarea" placeholder="Paste QR payload or JSON string here..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseScanQr">Cancel</button>
+                <button class="btn-primary" id="btnConfirmImportQr">
+                    <span>📥 Import Data</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Drive Sync Modal -->
+    <div class="modal-overlay" id="modalGoogleDriveSync">
+        <div class="ledger-modal modal-drive">
+            <div class="modal-gemini-header">
+                <div class="gemini-sparkle-icon">☁️</div>
+                <div>
+                    <h3 class="modal-title">Google Drive Sync & Cloud Backup</h3>
+                    <p class="modal-subtitle">Sync your encrypted Ledger binder with your personal Google Drive storage.</p>
+                </div>
+            </div>
+
+            <div class="drive-status-card">
+                <div class="drive-icon-badge">📁</div>
+                <div class="drive-info">
+                    <div class="drive-status-title" id="driveStatusTitle">Connected: Google Drive</div>
+                    <div class="drive-status-desc" id="driveStatusDesc">Encrypted archive: <code>ledger_backup_vault.json</code></div>
+                    <div class="drive-sync-time" id="driveSyncTime">Last Backup: Today, 9:30 PM</div>
+                </div>
+            </div>
+
+            <div class="drive-options-grid">
+                <button class="drive-action-btn" id="btnTriggerDriveExport">
+                    <span class="action-icon">⬆️</span>
+                    <span class="action-title">Export Backup Archive</span>
+                    <span class="action-sub">Download entire binder JSON backup</span>
+                </button>
+
+                <label class="drive-action-btn" id="lblTriggerDriveImport">
+                    <span class="action-icon">⬇️</span>
+                    <span class="action-title">Restore from Backup</span>
+                    <span class="action-sub">Import and merge saved JSON file</span>
+                    <input type="file" id="inputDriveBackupFile" accept=".json,.ledger" style="display:none;">
+                </label>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btnCloseDriveSync">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification Banner -->
     <div class="ledger-toast" id="ledgerToast"></div>
 
+    <script src="qr-helper.js"></script>
     <script src="app.js"></script>
     <script src="stitch-toggle.js"></script>
+    <script>
+        // Register PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('[Ledger PWA] Service Worker registered:', reg.scope))
+                    .catch(err => console.log('[Ledger PWA] Service Worker registration failed:', err));
+            });
+        }
+    </script>
 </body>
 </html>
