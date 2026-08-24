@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGrad512" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#1e334d"/>
+      <stop offset="50%" stop-color="#0d1b2e"/>
+      <stop offset="100%" stop-color="#060e18"/>
+    </radialGradient>
+    <linearGradient id="goldGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="35%" stop-color="#b8935a"/>
+      <stop offset="70%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#85581a"/>
+    </linearGradient>
+    <filter id="glow512" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <!-- Background with leather texture corners -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad512)" stroke="url(#goldGrad512)" stroke-width="10"/>
+  
+  <!-- Outer Gold Rings & Stitches -->
+  <circle cx="256" cy="256" r="204" fill="none" stroke="url(#goldGrad512)" stroke-width="4" stroke-dasharray="10,8" opacity="0.65"/>
+  <circle cx="256" cy="256" r="188" fill="none" stroke="url(#goldGrad512)" stroke-width="8"/>
+  
+  <!-- Corner Rivets -->
+  <circle cx="75" cy="75" r="10" fill="url(#goldGrad512)"/>
+  <circle cx="437" cy="75" r="10" fill="url(#goldGrad512)"/>
+  <circle cx="75" cy="437" r="10" fill="url(#goldGrad512)"/>
+  <circle cx="437" cy="437" r="10" fill="url(#goldGrad512)"/>
+  
+  <!-- Monogram Logo -->
+  <text x="256" y="320" font-family="'Cinzel', serif" font-size="210" font-weight="900" fill="url(#goldGrad512)" text-anchor="middle" filter="url(#glow512)">M</text>
+  
+  <!-- AI Sparkle Top Right -->
+  <path d="M 356 130 Q 356 160 386 160 Q 356 160 356 190 Q 356 160 326 160 Q 356 160 356 130 Z" fill="#fef08a" filter="url(#glow512)"/>
+</svg>

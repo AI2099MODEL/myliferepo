@@ -1,6 +1,6 @@
 {
-  "name": "Ledger — Personal Binder & Organizer",
-  "short_name": "Ledger",
+  "name": "MyLyfe — Personal Binder & AI Studio",
+  "short_name": "MyLyfe",
   "description": "Personal offline notebook, organizer, and binder for threads, journal diary, calendar events, vault documents, and task checklists with Gemini AI.",
   "start_url": "./index.html",
   "display": "standalone",
@@ -9,8 +9,14 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230d1b2e'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%23b8935a' stroke-width='16'/%3E%3Ctext x='256' y='330' font-family='serif' font-size='240' font-weight='bold' fill='%23b8935a' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E",
-      "sizes": "192x192 512x512",
+      "src": "./icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.svg",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }

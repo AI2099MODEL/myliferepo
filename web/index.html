@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ledger — Personal Offline Binder & Organizer</title>
-    <meta name="description" content="Personal offline notebook, organizer, and binder for threads, journal diary, calendar events, vault documents, and task checklists.">
+    <title>MyLyfe — Personal Binder & AI Studio</title>
+    <meta name="description" content="MyLyfe — Personal offline notebook, organizer, and binder for threads, journal diary, calendar events, vault documents, and task checklists with Google Gemini AI.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d1b2e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230d1b2e'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%23b8935a' stroke-width='16'/%3E%3Ctext x='256' y='330' font-family='serif' font-size='240' font-weight='bold' fill='%23b8935a' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="icons/icon-192.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Google Identity Services (Google Sign-In) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Google AdSense (Configurable Publisher ID) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000" crossorigin="anonymous" id="googleAdSenseScript"></script>
 </head>
 <body>
+
     <!-- Biometric Authentication App Lock Screen -->
     <div class="biometric-lock-overlay" id="biometricLockScreen">
         <div class="biometric-card">
@@ -143,13 +151,34 @@
             <!-- Top Ledger Ink Header -->
             <header class="ledger-header" id="ledgerHeader">
                 <div class="header-branding">
-                    <div class="header-icon-badge">L</div>
+                    <div class="header-icon-badge">M</div>
                     <div>
-                        <h1 class="header-title" id="headerTitle">Ledger Threads</h1>
+                        <h1 class="header-title" id="headerTitle">MyLyfe Threads</h1>
                         <p class="header-subtitle" id="headerSubtitle">Encrypted local messaging • Local Room Persistence</p>
                     </div>
                 </div>
                 <div class="header-actions" id="headerActions">
+                    <!-- Google Profile / Sign-In Component -->
+                    <div class="google-auth-container" id="googleAuthContainer">
+                        <button class="btn-google-signin" id="btnGoogleSignIn" title="Sign in with Google Account">
+                            <svg class="google-g-icon" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                            </svg>
+                            <span>Google Sign-In</span>
+                        </button>
+                        <div class="google-user-badge hidden" id="googleUserBadge">
+                            <img class="user-avatar" id="userAvatar" src="" alt="Avatar">
+                            <div class="user-info-text">
+                                <span class="user-name" id="userName">User</span>
+                                <span class="user-email" id="userEmail">user@gmail.com</span>
+                            </div>
+                            <button class="btn-user-signout" id="btnGoogleSignOut" title="Sign out">✕</button>
+                        </div>
+                    </div>
+
                     <button class="btn-tool-outline" id="btnHeaderShareQr" title="Share via Offline QR Code">
                         <span>📱 QR Code</span>
                     </button>
@@ -963,53 +992,125 @@
         </div>
     </div>
 
-    <!-- Gemini AI Studio Settings Modal -->
+    <!-- App & Cloud Settings Modal -->
     <div class="modal-overlay" id="modalGeminiSettings">
-        <div class="ledger-modal modal-gemini">
+        <div class="ledger-modal modal-gemini modal-large">
             <div class="modal-gemini-header">
-                <div class="gemini-sparkle-icon">✦</div>
+                <div class="gemini-sparkle-icon">⚙️</div>
                 <div>
-                    <h3 class="modal-title">Google Gemini AI Studio Settings</h3>
-                    <p class="modal-subtitle">Power intelligent search, reflections, and task breakdowns across Ledger.</p>
+                    <h3 class="modal-title">MyLyfe App & Cloud Settings</h3>
+                    <p class="modal-subtitle">Configure Gemini AI, Google Authentication, AdSense, and Firebase Hosting (mylyfe.web.app).</p>
                 </div>
             </div>
 
-            <div class="form-group">
-                <div class="form-label-row">
-                    <label>Google AI Studio API Key</label>
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-get-key">Get Free API Key ↗</a>
-                </div>
-                <div class="input-with-action">
-                    <input type="password" id="inputGeminiApiKey" class="ledger-input font-mono" placeholder="AIzaSy...">
-                    <button class="btn-input-eye" id="btnToggleApiKeyVisibility" title="Toggle visibility">👁</button>
-                </div>
-                <span class="field-hint">Your API key is stored securely in your browser's local storage and used only for direct calls to Google Gemini API.</span>
+            <!-- Settings Tab Switcher -->
+            <div class="settings-tabs-row" id="settingsTabsRow">
+                <button class="settings-tab-btn active" data-tab="gemini">✦ Gemini AI</button>
+                <button class="settings-tab-btn" data-tab="auth">🔑 Google Login</button>
+                <button class="settings-tab-btn" data-tab="adsense">📢 Google AdSense</button>
+                <button class="settings-tab-btn" data-tab="firebase">☁️ Firebase Hosting</button>
             </div>
 
-            <div class="form-group">
-                <label>Default Gemini Model</label>
-                <div class="modal-pills-select" id="settingsModelSelect">
-                    <button class="select-pill active" data-value="gemini-2.5-flash">Gemini 2.5 Flash (Fast)</button>
-                    <button class="select-pill" data-value="gemini-1.5-flash">Gemini 1.5 Flash</button>
-                    <button class="select-pill" data-value="gemini-1.5-pro">Gemini 1.5 Pro (Deep)</button>
+            <!-- TAB 1: Gemini AI Settings -->
+            <div class="settings-tab-content active" id="tabContentGemini">
+                <div class="form-group">
+                    <div class="form-label-row">
+                        <label>Google AI Studio API Key</label>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-get-key">Get Free API Key ↗</a>
+                    </div>
+                    <div class="input-with-action">
+                        <input type="password" id="inputGeminiApiKey" class="ledger-input font-mono" placeholder="AIzaSy...">
+                        <button class="btn-input-eye" id="btnToggleApiKeyVisibility" title="Toggle visibility">👁</button>
+                    </div>
+                    <span class="field-hint">Your API key is stored securely in your browser's local storage and used only for direct calls to Google Gemini API.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Default Gemini Model</label>
+                    <div class="modal-pills-select" id="settingsModelSelect">
+                        <button class="select-pill active" data-value="gemini-2.5-flash">Gemini 2.5 Flash (Fast)</button>
+                        <button class="select-pill" data-value="gemini-1.5-flash">Gemini 1.5 Flash</button>
+                        <button class="select-pill" data-value="gemini-1.5-pro">Gemini 1.5 Pro (Deep)</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>AI Assistant Tone & Persona</label>
+                    <div class="modal-pills-select" id="settingsToneSelect">
+                        <button class="select-pill active" data-value="reflective">Reflective & Warm</button>
+                        <button class="select-pill" data-value="concise">Structured & Concise</button>
+                        <button class="select-pill" data-value="coach">Productivity Coach</button>
+                        <button class="select-pill" data-value="executive">Executive Analyst</button>
+                    </div>
+                </div>
+
+                <div class="connection-test-row">
+                    <button class="btn-test-connection" id="btnTestGeminiConnection">
+                        <span>⚡ Test Connection</span>
+                    </button>
+                    <span class="connection-status-msg" id="connectionStatusMsg">Not tested</span>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>AI Assistant Tone & Persona</label>
-                <div class="modal-pills-select" id="settingsToneSelect">
-                    <button class="select-pill active" data-value="reflective">Reflective & Warm</button>
-                    <button class="select-pill" data-value="concise">Structured & Concise</button>
-                    <button class="select-pill" data-value="coach">Productivity Coach</button>
-                    <button class="select-pill" data-value="executive">Executive Analyst</button>
+            <!-- TAB 2: Google Login & Identity -->
+            <div class="settings-tab-content" id="tabContentAuth">
+                <div class="form-group">
+                    <label>Google OAuth 2.0 Client ID (Optional for Custom Domain)</label>
+                    <input type="text" id="inputGoogleClientId" class="ledger-input font-mono" placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com">
+                    <span class="field-hint">Leave blank to use default browser Google Identity Services sign-in session.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Google Account Linked Status</label>
+                    <div class="auth-status-card" id="authStatusCard">
+                        <div class="auth-status-indicator" id="authStatusIndicator">⚪ Not Signed In</div>
+                        <p class="auth-status-desc">Signing in with your Google account enables encrypted cloud backups, cross-device sync, and personalized AI synthesis.</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkAutoBiometric" checked>
+                        <span>Automatically unlock Vault when authenticated with Google Login</span>
+                    </label>
                 </div>
             </div>
 
-            <div class="connection-test-row">
-                <button class="btn-test-connection" id="btnTestGeminiConnection">
-                    <span>⚡ Test Connection</span>
-                </button>
-                <span class="connection-status-msg" id="connectionStatusMsg">Not tested</span>
+            <!-- TAB 3: Google AdSense -->
+            <div class="settings-tab-content" id="tabContentAdsense">
+                <div class="form-group">
+                    <label>Google AdSense Publisher ID</label>
+                    <input type="text" id="inputAdSensePubId" class="ledger-input font-mono" placeholder="ca-pub-0000000000000000">
+                    <span class="field-hint">Enter your AdSense Publisher ID. Stored locally without committing secrets to repository.</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="checkEnableAdSense" checked>
+                        <span>Enable unobtrusive banner ad placements</span>
+                    </label>
+                </div>
+
+                <div class="adsense-preview-box">
+                    <span class="ads-tag">ADSENSE AD SLOT PREVIEW</span>
+                    <div class="mock-ad-banner">
+                        <span class="ad-sponsor-label">Sponsored Banner • 728x90 / Responsive</span>
+                        <p class="ad-sponsor-text">MyLyfe Clean Ad Placement Container</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: Firebase Hosting & Deployment -->
+            <div class="settings-tab-content" id="tabContentFirebase">
+                <div class="firebase-info-card">
+                    <div class="firebase-badge">🔥 FIREBASE HOSTING TARGET</div>
+                    <h4 class="firebase-domain">https://mylyfe.web.app</h4>
+                    <p class="firebase-desc">Configured for instant zero-config deployment. All static assets, PWA service worker, and stitch previews are optimized for edge delivery.</p>
+                    
+                    <div class="deploy-commands-box">
+                        <code>npx -y firebase-tools deploy --only hosting</code>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-actions">
@@ -1018,6 +1119,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Real-Time Event Alarm & Notification Modal -->
+    <div class="modal-overlay" id="modalEventAlarm">
+        <div class="ledger-modal modal-alarm">
+            <div class="alarm-bell-animation">
+                <div class="alarm-bell-icon">⏰</div>
+                <div class="alarm-pulse-ring"></div>
+            </div>
+
+            <h3 class="alarm-title" id="alarmEventTitle">Event Reminder</h3>
+            <p class="alarm-time" id="alarmEventTime">Scheduled at 09:00 AM</p>
+            <p class="alarm-location" id="alarmEventLocation">📍 Location</p>
+
+            <div class="alarm-actions">
+                <button class="btn-secondary" id="btnSnoozeAlarm">⏱ Snooze 5 Min</button>
+                <button class="btn-primary btn-dismiss-alarm" id="btnDismissAlarm">✓ Dismiss</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- AI Journal Reflection Modal -->
     <div class="modal-overlay" id="modalAiReflection">
