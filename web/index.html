@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="icons/icon-192.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <!-- Google Identity Services (Google Sign-In) -->
@@ -195,6 +195,11 @@
                         </select>
                     </div>
 
+                    <!-- Product Showcase Website Link -->
+                    <a href="landing.html" target="_blank" class="btn-tool-pill btn-website-pill" id="btnOpenWebsite" title="Open Product Showcase Website">
+                        <span>🌐 Website</span>
+                    </a>
+
                     <!-- Phone App Device Frame View Toggle -->
                     <button class="btn-tool-pill" id="btnToggleDeviceFrame" title="Toggle Mobile Phone Mockup View">
                         <span>📱 Phone View</span>
@@ -281,7 +286,10 @@
 
                     <div class="thread-info-banner" id="threadInfoBanner">
                         <span class="banner-thread-name" id="bannerThreadName">Active: Family (Family)</span>
-                        <span class="banner-thread-count" id="bannerThreadCount">3 msgs</span>
+                        <div class="thread-banner-actions">
+                            <span class="banner-thread-count" id="bannerThreadCount">3 msgs</span>
+                            <button class="btn-tool-mini btn-delete-thread-banner" id="btnDeleteCurrentThread" title="Delete this conversation thread">🗑️ Delete Thread</button>
+                        </div>
                     </div>
                     <div class="chat-messages-container" id="chatMessagesContainer">
                         <!-- Messages dynamically rendered here -->
@@ -740,7 +748,10 @@
                                         <span class="card-icon">🗓️</span>
                                         <span class="card-title">Social Media Scheduler</span>
                                     </div>
-                                    <button class="btn-tool-mini" id="btnRefreshScheduler">↻ Refresh Queue</button>
+                                    <div class="head-actions-row">
+                                        <button class="btn-tool-mini btn-social-cfg" id="btnOpenSocialAccounts">⚙️ Accounts</button>
+                                        <button class="btn-tool-mini" id="btnRefreshScheduler">↻ Refresh</button>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -935,9 +946,12 @@
                     <span class="checkbox-text">Pin this entry to the top</span>
                 </label>
             </div>
-            <div class="modal-actions">
-                <button class="btn-secondary" id="btnCloseDiaryModal">Cancel</button>
-                <button class="btn-primary" id="btnSaveDiaryEntry">Save Entry</button>
+            <div class="modal-actions modal-actions-space">
+                <button class="btn-tool-outline btn-danger-outline hidden" id="btnDeleteDiaryEntry">🗑️ Delete Entry</button>
+                <div class="modal-actions-right">
+                    <button class="btn-secondary" id="btnCloseDiaryModal">Cancel</button>
+                    <button class="btn-primary" id="btnSaveDiaryEntry">Save Entry</button>
+                </div>
             </div>
         </div>
     </div>
@@ -945,7 +959,7 @@
     <!-- New Event Modal -->
     <div class="modal-overlay" id="modalEvent">
         <div class="ledger-modal">
-            <h3 class="modal-title">Schedule Event</h3>
+            <h3 class="modal-title" id="eventModalTitle">Schedule Event</h3>
             <div class="form-group">
                 <label>Event Title</label>
                 <input type="text" id="inputEventTitle" class="ledger-input" placeholder="e.g. Strategy Review">
@@ -980,9 +994,12 @@
                     <span class="checkbox-text">Notify me with reminder</span>
                 </label>
             </div>
-            <div class="modal-actions">
-                <button class="btn-secondary" id="btnCloseEventModal">Cancel</button>
-                <button class="btn-primary" id="btnSaveEvent">Schedule Event</button>
+            <div class="modal-actions modal-actions-space">
+                <button class="btn-tool-outline btn-danger-outline hidden" id="btnDeleteEventModal">🗑️ Delete Event</button>
+                <div class="modal-actions-right">
+                    <button class="btn-secondary" id="btnCloseEventModal">Cancel</button>
+                    <button class="btn-primary" id="btnSaveEvent">Schedule Event</button>
+                </div>
             </div>
         </div>
     </div>
@@ -990,7 +1007,7 @@
     <!-- New Vault Document Modal -->
     <div class="modal-overlay" id="modalVault">
         <div class="ledger-modal">
-            <h3 class="modal-title">Add Document to Vault</h3>
+            <h3 class="modal-title" id="vaultModalTitle">Add Document to Vault</h3>
             <div class="form-group">
                 <label>Document Title</label>
                 <input type="text" id="inputVaultTitle" class="ledger-input" placeholder="e.g. Passport Scan 2026">
@@ -1023,9 +1040,12 @@
                 <label>Notes / Policy Number</label>
                 <textarea id="inputVaultNotes" class="ledger-input ledger-textarea small" placeholder="Reference details, policy numbers..."></textarea>
             </div>
-            <div class="modal-actions">
-                <button class="btn-secondary" id="btnCloseVaultModal">Cancel</button>
-                <button class="btn-primary" id="btnSaveVaultDoc">Save to Vault</button>
+            <div class="modal-actions modal-actions-space">
+                <button class="btn-tool-outline btn-danger-outline hidden" id="btnDeleteVaultModal">🗑️ Delete Doc</button>
+                <div class="modal-actions-right">
+                    <button class="btn-secondary" id="btnCloseVaultModal">Cancel</button>
+                    <button class="btn-primary" id="btnSaveVaultDoc">Save to Vault</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1081,13 +1101,14 @@
                 <div class="gemini-sparkle-icon">⚙️</div>
                 <div>
                     <h3 class="modal-title">MyLyfe App & Cloud Settings</h3>
-                    <p class="modal-subtitle">Configure Gemini AI, Google Authentication, AdSense, and Firebase Hosting (mylyfe.web.app).</p>
+                    <p class="modal-subtitle">Configure Gemini AI, Google Authentication, Social Platforms, AdSense, and Firebase Hosting.</p>
                 </div>
             </div>
 
             <!-- Settings Tab Switcher -->
             <div class="settings-tabs-row" id="settingsTabsRow">
                 <button class="settings-tab-btn active" data-tab="gemini">✦ Gemini AI</button>
+                <button class="settings-tab-btn" data-tab="social">🎬 Social Accounts</button>
                 <button class="settings-tab-btn" data-tab="auth">🔑 Google Login</button>
                 <button class="settings-tab-btn" data-tab="adsense">📢 Google AdSense</button>
                 <button class="settings-tab-btn" data-tab="firebase">☁️ Firebase Hosting</button>
@@ -1131,6 +1152,122 @@
                         <span>⚡ Test Connection</span>
                     </button>
                     <span class="connection-status-msg" id="connectionStatusMsg">Not tested</span>
+                </div>
+            </div>
+
+            <!-- TAB: Social Media Accounts Configuration -->
+            <div class="settings-tab-content" id="tabContentSocial">
+                <p class="social-accounts-intro">Connect your accounts for one-click multi-platform video publishing & scheduling. All tokens are saved encrypted in your local browser storage and personal Google Drive backup.</p>
+
+                <div class="social-accounts-grid">
+                    <!-- YouTube Shorts -->
+                    <div class="social-account-card" data-platform="yt">
+                        <div class="social-card-top">
+                            <span class="social-card-icon">🔴</span>
+                            <span class="social-card-name">YouTube Shorts</span>
+                            <span class="social-conn-badge" id="badgeYtConn">Connected</span>
+                        </div>
+                        <input type="text" id="inputYtChannel" class="ledger-input social-input" placeholder="Channel Name or ID" value="@MyLyfeOfficial">
+                        <input type="password" id="inputYtToken" class="ledger-input social-input font-mono" placeholder="Google OAuth Upload Token / API Key" value="ya29.a0AfH6SM...">
+                        <div class="social-card-footer">
+                            <select id="selectYtPrivacy" class="header-select social-select">
+                                <option value="public">Public</option>
+                                <option value="unlisted">Unlisted</option>
+                                <option value="private">Private</option>
+                            </select>
+                            <button class="btn-test-social" data-platform="yt">⚡ Test</button>
+                        </div>
+                    </div>
+
+                    <!-- Instagram Reels -->
+                    <div class="social-account-card" data-platform="ig">
+                        <div class="social-card-top">
+                            <span class="social-card-icon">🟣</span>
+                            <span class="social-card-name">Instagram Reels</span>
+                            <span class="social-conn-badge" id="badgeIgConn">Connected</span>
+                        </div>
+                        <input type="text" id="inputIgHandle" class="ledger-input social-input" placeholder="@instagram_handle" value="@mylyfe_daily">
+                        <input type="password" id="inputIgToken" class="ledger-input social-input font-mono" placeholder="Meta Graph API Token" value="EAABwbz...">
+                        <div class="social-card-footer">
+                            <span class="social-status-sub">Reels Auto-Publish</span>
+                            <button class="btn-test-social" data-platform="ig">⚡ Test</button>
+                        </div>
+                    </div>
+
+                    <!-- Facebook Reels -->
+                    <div class="social-account-card" data-platform="fb">
+                        <div class="social-card-top">
+                            <span class="social-card-icon">🔷</span>
+                            <span class="social-card-name">Facebook Reels</span>
+                            <span class="social-conn-badge" id="badgeFbConn">Ready</span>
+                        </div>
+                        <input type="text" id="inputFbPage" class="ledger-input social-input" placeholder="Facebook Page ID" value="109283746582">
+                        <input type="password" id="inputFbToken" class="ledger-input social-input font-mono" placeholder="Page Access Token" value="EAAKzp...">
+                        <div class="social-card-footer">
+                            <span class="social-status-sub">Page Video API</span>
+                            <button class="btn-test-social" data-platform="fb">⚡ Test</button>
+                        </div>
+                    </div>
+
+                    <!-- TikTok -->
+                    <div class="social-account-card" data-platform="tt">
+                        <div class="social-card-top">
+                            <span class="social-card-icon">⚫</span>
+                            <span class="social-card-name">TikTok</span>
+                            <span class="social-conn-badge" id="badgeTtConn">Ready</span>
+                        </div>
+                        <input type="text" id="inputTtUsername" class="ledger-input social-input" placeholder="@tiktok_username" value="@mylyfe_clips">
+                        <input type="password" id="inputTtToken" class="ledger-input social-input font-mono" placeholder="TikTok Open API Session Key" value="act.82739...">
+                        <div class="social-card-footer">
+                            <span class="social-status-sub">Direct Post API</span>
+                            <button class="btn-test-social" data-platform="tt">⚡ Test</button>
+                        </div>
+                    </div>
+
+                    <!-- Pinterest -->
+                    <div class="social-account-card" data-platform="pin">
+                        <div class="social-card-top">
+                            <span class="social-card-icon">📌</span>
+                            <span class="social-card-name">Pinterest</span>
+                            <span class="social-conn-badge" id="badgePinConn">Ready</span>
+                        </div>
+                        <input type="text" id="inputPinBoard" class="ledger-input social-input" placeholder="Board Name" value="Mindful Life & Growth">
+                        <input type="password" id="inputPinToken" class="ledger-input social-input font-mono" placeholder="Pinterest Access Token" value="pina_0928...">
+                        <div class="social-card-footer">
+                            <span class="social-status-sub">Idea Pins & Video</span>
+                            <button class="btn-test-social" data-platform="pin">⚡ Test</button>
+                        </div>
+                    </div>
+
+                    <!-- X / Twitter -->
+                    <div class="social-account-card" data-platform="x">
+                        <div class="social-card-top">
+                            <span class="social-card-icon">⚪</span>
+                            <span class="social-card-name">X (Twitter)</span>
+                            <span class="social-conn-badge" id="badgeXConn">Ready</span>
+                        </div>
+                        <input type="text" id="inputXHandle" class="ledger-input social-input" placeholder="@handle" value="@MyLyfeApp">
+                        <input type="password" id="inputXToken" class="ledger-input social-input font-mono" placeholder="API Key / Bearer Token" value="AAAAAAAAAAAAAAAAAAAA...">
+                        <div class="social-card-footer">
+                            <span class="social-status-sub">Media Upload v2</span>
+                            <button class="btn-test-social" data-platform="x">⚡ Test</button>
+                        </div>
+                    </div>
+
+                    <!-- LinkedIn -->
+                    <div class="social-account-card" data-platform="li">
+                        <div class="social-card-top">
+                            <span class="social-card-icon">🔵</span>
+                            <span class="social-card-name">LinkedIn</span>
+                            <span class="social-conn-badge" id="badgeLiConn">Ready</span>
+                        </div>
+                        <input type="text" id="inputLiUrn" class="ledger-input social-input" placeholder="Profile or Org URN" value="urn:li:person:98234">
+                        <input type="password" id="inputLiToken" class="ledger-input social-input font-mono" placeholder="OAuth 2.0 Access Token" value="AQV7...">
+                        <div class="social-card-footer">
+                            <span class="social-status-sub">UGC Video API</span>
+                            <button class="btn-test-social" data-platform="li">⚡ Test</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

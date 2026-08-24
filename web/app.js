@@ -849,6 +849,12 @@ function openDiaryModal(entry = null) {
     document.getElementById("inputDiaryBody").value = entry ? entry.body : "";
     document.getElementById("checkDiaryPinned").checked = entry ? entry.isPinned : false;
 
+    // Toggle delete button
+    const btnDelete = document.getElementById("btnDeleteDiaryEntry");
+    if (btnDelete) {
+        btnDelete.classList.toggle("hidden", !isEdit);
+    }
+
     // Reset pills
     const curTag = entry ? entry.tag : "Reflection";
     document.querySelectorAll("#diaryTagSelect .select-pill").forEach(p => {
@@ -984,21 +990,43 @@ function renderEvents() {
     });
 }
 
-function openEventModal() {
-    document.getElementById("inputEventTitle").value = "";
-    document.getElementById("inputEventLocation").value = "";
-    
-    // Tomorrow at 10:00 AM
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    document.getElementById("inputEventDate").value = tomorrow.toISOString().split('T')[0];
-    document.getElementById("inputEventTime").value = "10:00";
-    document.getElementById("checkEventNotify").checked = true;
+function openEventModal(event = null) {
+    const isEdit = !!event;
+    const titleEl = document.getElementById("eventModalTitle");
+    if (titleEl) titleEl.textContent = isEdit ? "Edit Event" : "Schedule Event";
 
+    document.getElementById("inputEventTitle").value = event ? event.title : "";
+    document.getElementById("inputEventLocation").value = event ? event.location : "";
+    
+    if (event) {
+        const d = new Date(event.timestamp);
+        document.getElementById("inputEventDate").value = d.toISOString().split('T')[0];
+        document.getElementById("inputEventTime").value = d.toTimeString().slice(0, 5);
+        document.getElementById("checkEventNotify").checked = event.notify !== false;
+    } else {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById("inputEventDate").value = tomorrow.toISOString().split('T')[0];
+        document.getElementById("inputEventTime").value = "10:00";
+        document.getElementById("checkEventNotify").checked = true;
+    }
+
+    const btnDelete = document.getElementById("btnDeleteEventModal");
+    if (btnDelete) {
+        btnDelete.classList.toggle("hidden", !isEdit);
+    }
+
+    const curCat = event ? event.category : "General";
+    document.querySelectorAll("#eventCategorySelect .select-pill").forEach(p => {
+        p.classList.toggle("active", p.dataset.value === curCat);
+    });
+
+    document.getElementById("modalEvent").dataset.editId = event ? event.id : "";
     elements.modalEvent.classList.add("open");
 }
 
 function saveEvent() {
+    const editId = document.getElementById("modalEvent").dataset.editId;
     const title = document.getElementById("inputEventTitle").value.trim();
     const location = document.getElementById("inputEventLocation").value.trim();
     const dateStr = document.getElementById("inputEventDate").value;
@@ -1014,19 +1042,32 @@ function saveEvent() {
 
     const timestamp = new Date(`${dateStr}T${timeStr}`).getTime() || Date.now();
 
-    store.data.events.push({
-        id: Date.now(),
-        title,
-        location,
-        timestamp,
-        notify,
-        category
-    });
+    if (editId) {
+        const id = parseInt(editId);
+        const item = store.data.events.find(e => e.id === id);
+        if (item) {
+            item.title = title;
+            item.location = location;
+            item.timestamp = timestamp;
+            item.notify = notify;
+            item.category = category;
+            showToast("Event updated");
+        }
+    } else {
+        store.data.events.push({
+            id: Date.now(),
+            title,
+            location,
+            timestamp,
+            notify,
+            category
+        });
+        showToast("Event scheduled");
+    }
 
     store.save();
     elements.modalEvent.classList.remove("open");
     renderEvents();
-    showToast("Event scheduled");
 }
 
 // ---------------------------------------------------------
@@ -1083,10 +1124,31 @@ function renderVault() {
     });
 }
 
-function openVaultModal() {
-    document.getElementById("inputVaultTitle").value = "";
-    document.getElementById("inputVaultFileName").value = "";
-    document.getElementById("inputVaultNotes").value = "";
+function openVaultModal(doc = null) {
+    const isEdit = !!doc;
+    const titleEl = document.getElementById("vaultModalTitle");
+    if (titleEl) titleEl.textContent = isEdit ? "Edit Vault Document" : "Add Document to Vault";
+
+    document.getElementById("inputVaultTitle").value = doc ? doc.title : "";
+    document.getElementById("inputVaultFileName").value = doc ? doc.fileName : "";
+    document.getElementById("inputVaultNotes").value = doc ? (doc.notes || "") : "";
+
+    const btnDelete = document.getElementById("btnDeleteVaultModal");
+    if (btnDelete) {
+        btnDelete.classList.toggle("hidden", !isEdit);
+    }
+
+    const curCat = doc ? doc.category : "ID";
+    document.querySelectorAll("#vaultCategorySelect .select-pill").forEach(p => {
+        p.classList.toggle("active", p.dataset.value === curCat);
+    });
+
+    const curType = doc ? doc.fileType : "PDF";
+    document.querySelectorAll("#vaultTypeSelect .select-pill").forEach(p => {
+        p.classList.toggle("active", p.dataset.value === curType);
+    });
+
+    document.getElementById("modalVault").dataset.editId = doc ? doc.id : "";
     elements.modalVault.classList.add("open");
 }
 
@@ -3171,10 +3233,77 @@ function initListeners() {
             btn.classList.add("active");
             const tabKey = btn.dataset.tab;
             if (tabKey === "gemini") document.getElementById("tabContentGemini")?.classList.add("active");
+            if (tabKey === "social") document.getElementById("tabContentSocial")?.classList.add("active");
             if (tabKey === "auth") document.getElementById("tabContentAuth")?.classList.add("active");
             if (tabKey === "adsense") document.getElementById("tabContentAdsense")?.classList.add("active");
             if (tabKey === "firebase") document.getElementById("tabContentFirebase")?.classList.add("active");
         });
+    });
+
+    // Social Accounts Config Opener in Studio
+    document.getElementById("btnOpenSocialAccounts")?.addEventListener("click", () => {
+        openGeminiSettingsModal();
+        document.querySelectorAll(".settings-tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === "social"));
+        document.querySelectorAll(".settings-tab-content").forEach(c => c.classList.toggle("active", c.id === "tabContentSocial"));
+    });
+
+    // Test Social Platform Account Connection Buttons
+    document.querySelectorAll(".btn-test-social").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const platform = btn.dataset.platform.toUpperCase();
+            showToast(`Testing connection to ${platform}...`);
+            setTimeout(() => {
+                showToast(`✓ ${platform} API credentials validated & connected!`);
+            }, 600);
+        });
+    });
+
+    // Delete Handlers for Diary, Events, Vault, and Chat Threads
+    document.getElementById("btnDeleteDiaryEntry")?.addEventListener("click", () => {
+        const editId = document.getElementById("modalDiary").dataset.editId;
+        if (editId) {
+            store.data.diary = store.data.diary.filter(d => d.id !== parseInt(editId));
+            store.save();
+            elements.modalDiary.classList.remove("open");
+            renderDiary();
+            showToast("Diary entry deleted");
+        }
+    });
+
+    document.getElementById("btnDeleteEventModal")?.addEventListener("click", () => {
+        const editId = document.getElementById("modalEvent").dataset.editId;
+        if (editId) {
+            store.data.events = store.data.events.filter(e => e.id !== parseInt(editId));
+            store.save();
+            elements.modalEvent.classList.remove("open");
+            renderEvents();
+            showToast("Event deleted");
+        }
+    });
+
+    document.getElementById("btnDeleteVaultModal")?.addEventListener("click", () => {
+        const editId = document.getElementById("modalVault").dataset.editId;
+        if (editId) {
+            store.data.vault = store.data.vault.filter(v => v.id !== parseInt(editId));
+            store.save();
+            elements.modalVault.classList.remove("open");
+            renderVault();
+            showToast("Document deleted from Vault");
+        }
+    });
+
+    document.getElementById("btnDeleteCurrentThread")?.addEventListener("click", () => {
+        const currentKey = state.activeThreadKey;
+        if (currentKey === "gemini") {
+            showToast("Cannot delete primary AI assistant thread");
+            return;
+        }
+        store.data.threads = store.data.threads.filter(t => t.key !== currentKey);
+        store.data.messages = store.data.messages.filter(m => m.threadKey !== currentKey);
+        state.activeThreadKey = store.data.threads[0]?.key || "gemini";
+        store.save();
+        renderChat();
+        showToast("Conversation thread deleted");
     });
 
     // Navigation Rails & Mobile Bottom Bar

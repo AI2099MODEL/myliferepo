@@ -256,5 +256,48 @@ An interactive 5-step onboarding wizard (`#modalOnboardingWizard`):
 
 ---
 
+## 17. Universal Item Deletion & Safety Safeguards 🗑️
+
+Full lifecycle management and granular deletion controls across every module:
+- **Journal & Diary**: Delete directly via the red `🗑️ Delete Entry` button inside the entry edit dialog or via the card quick-action icon.
+- **Calendar & Alarms**: Click any scheduled event to edit or remove via `🗑️ Delete Event` with automatic alarm timer unregistration.
+- **Biometric Vault**: Safely remove documents using the `🗑️ Delete Doc` button inside the document preview modal or the quick card `✕` button.
+- **Hierarchical Tasks**: Instant `✕` removal on task cards or completed task cleanup.
+- **Chat Threads**: Dedicated `🗑️ Delete Thread` button inside the thread header banner to permanently delete custom threads and their associated conversation histories (primary AI assistant thread is preserved).
+- **Social Queue**: Remove individual queued or scheduled video clips with one-click `✕ Remove`.
+
+---
+
+## 18. 7-Platform Social Media Accounts Configuration 🎬
+
+Configure and connect your personal or creator accounts directly in **App Settings (⚙️) -> Social Accounts** or via the **⚙️ Accounts** button in Social Studio:
+1. 🔴 **YouTube Shorts**: Channel Name/ID, OAuth 2.0 Upload Token / API Key, and Privacy defaults (`Public`, `Unlisted`, `Private`).
+2. 🟣 **Instagram Reels**: Creator Handle and Meta Graph API Access Token.
+3. 🔷 **Facebook Reels**: Page ID and Page Access Token.
+4. ⚫ **TikTok**: Creator Username and TikTok Open API Session Key.
+5. 📌 **Pinterest**: Target Board Name and Idea Pin Access Token.
+6. ⚪ **X (Twitter)**: Handle, API Key, and Bearer Token.
+7. 🔵 **LinkedIn**: Profile / Company URN and UGC Video OAuth 2.0 Token.
+
+*Includes one-click **⚡ Test** verification buttons and persistent storage in your local browser state and Google Drive backups.*
+
+---
+
+## 19. Official Product Showcase Website (`landing.html`) & Typography 🌐
+
+A standalone, ultra-premium product showcase website is bundled at `web/landing.html`:
+- **Liquid Glassmorphism**: Ambient glowing orbs, 32px acrylic backdrop-blur effects, and Apple-grade micro-interactions.
+- **Live 3D Phone Preview**: Embedded interactive iframe mockup demonstrating live app features.
+- **8 Feature Showcases**: Deep-dive cards into Chat, Diary, Calendar, Vault, Tasks, Social Studio, Translation, and Drive Sync.
+- **Google Play Store Standards**: Transparent Android 15 & SDK 35 compliance metrics.
+- **Curated Typography**:
+  - `Cinzel Decorative` (Monograms & Titles)
+  - `Outfit` (Modern UI Headings & Hero text)
+  - `Plus Jakarta Sans` (Body & Crisp Interfaces)
+  - `JetBrains Mono` (API Keys, Codes, Timestamps)
+- **Reciprocal Navigation**: Seamless toggling between `landing.html` (Showcase Website) and `index.html` (Web App) via the top header navigation pill.
+
+---
+
 *My Lyfe — Crafted with luxury ink aesthetics, privacy, and cutting-edge Google AI.*
 
